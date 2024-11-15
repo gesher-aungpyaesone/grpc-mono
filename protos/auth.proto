@@ -1,0 +1,67 @@
+syntax = "proto3";
+
+package auth;
+
+import "google/protobuf/timestamp.proto";
+
+service AuthHealthService {
+  rpc check (AuthHealthCheckRequest) returns (AuthHealthCheckResponse);
+}
+
+message AuthHealthCheckRequest {
+}
+
+message AuthHealthCheckResponse {
+  bool status = 1;
+}
+
+enum SystemUserType {
+  CUSTOMER = 0;
+  STAFF = 1;
+}
+
+enum TokenType {
+  RESET = 0;
+  VERIFY = 1;
+}
+
+message Staff {
+  int32 id = 1;
+  int32 user_id = 2;
+  string first_name = 3;
+  string last_name = 4;
+  string email = 5;
+  optional string password = 6;
+  string department = 7;
+  int32 position_id = 8;
+  optional string profile_path = 9;
+  optional string cover_photo_path = 10;
+  optional string bio = 11;
+  optional google.protobuf.Timestamp created_at = 12;
+  optional google.protobuf.Timestamp updated_at = 13;
+  optional google.protobuf.Timestamp deleted_at = 14;
+  optional int32 created_by_id = 15;
+  optional int32 update_by_id = 16;
+  optional int32 deleted_by_id = 17;
+}
+
+message StaffCreateRequest {
+  string first_name = 1;
+  string last_name = 2;
+  string email = 3;
+  string password = 4;
+  string department = 5;
+  int32 position_id = 6;
+  optional string profile_path = 7;
+  optional string cover_photo_path = 8;
+  optional string bio = 9;
+  int32 created_by_id = 10;
+}
+
+message StaffResponse {
+  Staff staff = 1;
+}
+
+service StaffService {
+  rpc create (StaffCreateRequest) returns (StaffResponse);
+}

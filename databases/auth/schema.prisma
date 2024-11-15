@@ -1,0 +1,79 @@
+datasource db {
+    provider = "mysql"
+    url      = env("AUTH_MS_DATABASE_URL")
+}
+
+generator client {
+    provider = "prisma-client-js"
+    output   = "../../node_modules/@prisma/auth-ms"
+}
+
+enum SystemUserType {
+    CUSTOMER
+    STAFF
+}
+
+enum TokenType {
+    RESET
+    VERIFY
+}
+
+model User {
+    id    Int            @id @default(autoincrement())
+    type  SystemUserType
+    staff Staff?
+
+    @@map("users")
+}
+
+model StaffPosition {
+    id            Int       @id @default(autoincrement())
+    name          String    @db.VarChar(255)
+    description   String    @db.Text
+    created_at    DateTime  @default(now())
+    updated_at    DateTime  @updatedAt
+    deleted_at    DateTime?
+    created_by_id Int
+    update_by_id  Int
+    deleted_by_id Int?
+    staffs        Staff[]
+
+    @@map("staff_positions")
+}
+
+model Staff {
+    id               Int           @id @default(autoincrement())
+    user             User          @relation(fields: [user_id], references: [id])
+    user_id          Int           @unique
+    first_name       String        @db.VarChar(255)
+    last_name        String        @db.VarChar(255)
+    email            String        @unique @db.VarChar(255)
+    password         String        @db.VarChar(255)
+    department       String        @db.VarChar(255)
+    position         StaffPosition @relation(fields: [position_id], references: [id])
+    position_id      Int
+    profile_path     String?       @db.VarChar(255)
+    cover_photo_path String?       @db.VarChar(255)
+    bio              String?       @db.Text
+    created_at       DateTime      @default(now())
+    updated_at       DateTime      @updatedAt
+    deleted_at       DateTime?
+    created_by_id    Int
+    update_by_id     Int
+    deleted_by_id    Int?
+    tokens           StaffToken[]
+
+    @@map("staffs")
+}
+
+model StaffToken {
+    id         Int       @id @default(autoincrement())
+    staff      Staff     @relation(fields: [staff_id], references: [id])
+    staff_id   Int
+    token      String    @unique
+    type       TokenType
+    expires_at DateTime
+    created_at DateTime  @default(now())
+
+    @@map("staff_tokens")
+}

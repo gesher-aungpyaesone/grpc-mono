@@ -1,0 +1,9 @@
+# .eslintignore
+
+# Ignore db folder
+db/
+
+# You can add other folders or files to ignore as well:
+# node_modules/
+# dist/
+# .env

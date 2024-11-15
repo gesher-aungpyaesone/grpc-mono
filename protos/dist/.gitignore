@@ -1,0 +1,5 @@
+# Ignore everything in the prisma-client folder
+*
+
+# But do not ignore .gitignore file
+!.gitignore
