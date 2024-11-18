@@ -59,9 +59,46 @@ message StaffCreateRequest {
 }
 
 message StaffResponse {
-  Staff staff = 1;
+  Staff data = 1;
+}
+
+message StaffUpdateRequest {
+  string first_name = 1;
+  string last_name = 2;
+  string email = 3;
+  string password = 4;
+  string department = 5;
+  int32 position_id = 6;
+  optional string profile_path = 7;
+  optional string cover_photo_path = 8;
+  optional string bio = 9;
+  int32 updated_by_id = 10;
+  int32 id = 11;
+}
+
+message StaffDeleteRequest {
+  int32 id = 1;
+}
+
+message StaffListRequest {
+  optional string sort = 1; // ["field_name", "ASC/DESC"]
+  optional string range = 2;  // [start, end]
+  optional string filter = 3; // {"field": "value", "field2": "value2"}
+}
+
+message StaffGetOneRequest {
+  int32 id = 1;
+}
+
+message StaffListResponse {
+  repeated Staff data = 1;
+  int32 total_count = 2;
 }
 
 service StaffService {
   rpc create (StaffCreateRequest) returns (StaffResponse);
+  rpc update (StaffUpdateRequest) returns (StaffResponse);
+  rpc delete (StaffDeleteRequest) returns (StaffResponse);
+  rpc getOne (StaffGetOneRequest) returns (StaffResponse);
+  rpc getList (StaffListRequest) returns (StaffListResponse);
 }

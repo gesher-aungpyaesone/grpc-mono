@@ -23,6 +23,8 @@ async function bootstrap() {
     app.register(helmet, {
       contentSecurityPolicy: false,
     });
+  } else {
+    app.enableCors();
   }
 
   app.setGlobalPrefix('api');
