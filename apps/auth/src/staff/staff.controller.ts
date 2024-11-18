@@ -1,4 +1,3 @@
-import { AuthPrismaService } from '@app/prisma/auth-prisma.service';
 import { Controller } from '@nestjs/common';
 import { GrpcMethod } from '@nestjs/microservices';
 import {
@@ -6,7 +5,8 @@ import {
   StaffCreateRequest,
   StaffResponse,
 } from 'protos/dist/auth';
-import { transformTimestamps } from 'utils/timestamp-utils';
+import { AuthPrismaService } from '@app/prisma/auth-prisma.service';
+import { transformTimestamps } from 'utils';
 
 @Controller('staff')
 export class StaffController {

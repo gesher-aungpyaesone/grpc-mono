@@ -6,12 +6,14 @@ import {
 import { AppModule } from './app.module';
 import helmet from '@fastify/helmet';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { CustomValidationPipe } from 'utils';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
     new FastifyAdapter(),
   );
+  app.useGlobalPipes(new CustomValidationPipe());
 
   if (process.env.NODE_ENV === 'production') {
     app.enableCors({

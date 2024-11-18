@@ -6,8 +6,9 @@ import {
   StaffResponse,
   StaffServiceClient,
 } from 'protos/dist/auth';
-import { Observable } from 'rxjs';
+import { Observable, catchError } from 'rxjs';
 import { StaffCreateDto } from './dto';
+import { handleError } from 'utils';
 
 @Controller('staff')
 export class StaffController implements OnModuleInit {
@@ -21,6 +22,12 @@ export class StaffController implements OnModuleInit {
 
   @Post()
   create(@Body() createStaffDto: StaffCreateDto): Observable<StaffResponse> {
-    return this.staffService.create({ ...createStaffDto, created_by_id: 1 });
+    return this.staffService
+      .create({ ...createStaffDto, created_by_id: 1 })
+      .pipe(
+        catchError((error) => {
+          throw handleError(error);
+        }),
+      );
   }
 }
