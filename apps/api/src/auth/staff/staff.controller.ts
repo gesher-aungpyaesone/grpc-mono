@@ -35,7 +35,7 @@ export class StaffController implements OnModuleInit {
   @Post()
   create(@Body() staffCreateDto: StaffCreateDto): Observable<StaffResponse> {
     return this.staffService
-      .create({ ...staffCreateDto, created_by_id: 1 })
+      .create({ ...staffCreateDto, created_by_id: 1 }) // TODO: update created by id
       .pipe(
         catchError((error) => {
           throw handleError(error);

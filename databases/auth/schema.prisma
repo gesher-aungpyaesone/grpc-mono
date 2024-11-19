@@ -29,12 +29,12 @@ model User {
 model StaffPosition {
     id            Int       @id @default(autoincrement())
     name          String    @db.VarChar(255)
-    description   String    @db.Text
+    description   String?    @db.Text
     created_at    DateTime  @default(now())
     updated_at    DateTime  @updatedAt
     deleted_at    DateTime?
     created_by_id Int
-    update_by_id  Int
+    updated_by_id  Int
     deleted_by_id Int?
     staffs        Staff[]
 
@@ -59,7 +59,7 @@ model Staff {
     updated_at       DateTime      @updatedAt
     deleted_at       DateTime?
     created_by_id    Int
-    update_by_id     Int
+    updated_by_id     Int
     deleted_by_id    Int?
     tokens           StaffToken[]
 

@@ -19,26 +19,26 @@ export function handleError(error: any) {
     case grpc.status.NOT_FOUND:
       return new NotFoundException({
         statusCode: HttpStatus.NOT_FOUND,
-        errors: [error.details],
+        errors: { root: { serverError: error.details } },
       });
 
     case grpc.status.UNAUTHENTICATED:
       return new UnauthorizedException({
         statusCode: HttpStatus.UNAUTHORIZED,
-        errors: [error.details],
+        errors: { root: { serverError: error.details } },
       });
 
     case grpc.status.PERMISSION_DENIED:
       return new ForbiddenException({
         statusCode: HttpStatus.FORBIDDEN,
-        errors: [error.details],
+        errors: { root: { serverError: error.details } },
       });
 
     case grpc.status.UNAVAILABLE:
     default:
       return new InternalServerErrorException({
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-        errors: [error.details],
+        errors: { root: { serverError: error.details } },
       });
   }
 }

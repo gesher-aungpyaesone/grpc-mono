@@ -4,6 +4,7 @@ import { AuthService } from './auth.service';
 import { ConfigModule } from '@nestjs/config';
 import { StaffModule } from './staff/staff.module';
 import { PrismaModule } from '@app/prisma';
+import { StaffPositionModule } from './staff-position/staff-position.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { PrismaModule } from '@app/prisma';
     }),
     PrismaModule,
     StaffModule,
+    StaffPositionModule,
   ],
   controllers: [AuthController],
   providers: [AuthService],

@@ -9,7 +9,7 @@ async function main() {
       name: 'Manager',
       description: 'Responsible for overseeing staff and operations.',
       created_by_id: 1,
-      update_by_id: 1,
+      updated_by_id: 1,
     },
   });
 
@@ -32,7 +32,7 @@ async function main() {
       position_id: staffPosition.id,
       bio: 'Experienced manager with a passion for leadership.',
       created_by_id: 1,
-      update_by_id: 1,
+      updated_by_id: 1,
     },
   });
 

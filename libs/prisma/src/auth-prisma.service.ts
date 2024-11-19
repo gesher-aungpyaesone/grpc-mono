@@ -1,11 +1,22 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
-import { Prisma, PrismaClient, Staff, SystemUserType } from '@prisma/auth-ms';
+import {
+  Prisma,
+  PrismaClient,
+  Staff,
+  StaffPosition,
+  SystemUserType,
+} from '@prisma/auth-ms';
 import {
   StaffCreateRequest,
   StaffDeleteRequest,
   StaffGetOneRequest,
   StaffListRequest,
+  StaffPositionCreateRequest,
+  StaffPositionDeleteRequest,
+  StaffPositionGetOneRequest,
+  StaffPositionListRequest,
+  StaffPositionUpdateRequest,
   StaffUpdateRequest,
 } from 'protos/dist/auth';
 import * as grpc from '@grpc/grpc-js';
@@ -37,19 +48,21 @@ export class AuthPrismaService extends PrismaClient implements OnModuleInit {
     }
   }
 
-  private async validatePositionExistence(position_id: number): Promise<void> {
+  private async validateStaffPositionExistence(
+    position_id: number,
+  ): Promise<StaffPosition> {
     const position = await this.staffPosition.findUnique({
       where: { id: position_id },
     });
 
     if (!position) {
       throw new RpcException({
-        code: grpc.status.INVALID_ARGUMENT,
-        message: JSON.stringify({
-          position_id: 'position_id does not exist',
-        }),
+        code: grpc.status.NOT_FOUND,
+        message: 'position not found',
       });
     }
+
+    return position;
   }
 
   private async validateStaffExistence(staff_id: number): Promise<Staff> {
@@ -70,7 +83,7 @@ export class AuthPrismaService extends PrismaClient implements OnModuleInit {
     const { email, password, position_id } = staffCreateRequest;
 
     await this.validateEmailUniqueness(email);
-    await this.validatePositionExistence(position_id);
+    await this.validateStaffPositionExistence(position_id);
 
     const hashedPassword = await hashPassword(password);
 
@@ -89,7 +102,7 @@ export class AuthPrismaService extends PrismaClient implements OnModuleInit {
         bio: staffCreateRequest.bio,
         position: { connect: { id: staffCreateRequest.position_id } },
         created_by_id: staffCreateRequest.created_by_id,
-        update_by_id: staffCreateRequest.created_by_id,
+        updated_by_id: staffCreateRequest.created_by_id,
       },
     });
 
@@ -122,10 +135,27 @@ export class AuthPrismaService extends PrismaClient implements OnModuleInit {
       queryOptions.skip = parsedRange[0];
       queryOptions.take = parsedRange[1] - parsedRange[0];
     }
-    if (parsedFilter) {
+    if (parsedFilter && Object.keys(parsedFilter).length > 0) {
+      const filterConditions: Record<string, any> = {};
+      for (const key in parsedFilter) {
+        if (key in parsedFilter) {
+          const filterValue = parsedFilter[key];
+          if (key === 'id' && Array.isArray(filterValue)) {
+            filterConditions[key] = { in: filterValue };
+          } else if (typeof filterValue === 'string') {
+            filterConditions[key] = {
+              contains: filterValue,
+              mode: 'insensitive',
+            };
+          } else {
+            filterConditions[key] = filterValue;
+          }
+        }
+      }
+
       queryOptions.where = {
         ...queryOptions.where,
-        ...parsedFilter,
+        ...filterConditions,
       };
     }
 
@@ -145,7 +175,7 @@ export class AuthPrismaService extends PrismaClient implements OnModuleInit {
 
     if (existingStaff.email !== email)
       await this.validateEmailUniqueness(email);
-    await this.validatePositionExistence(position_id);
+    await this.validateStaffPositionExistence(position_id);
 
     const hashedPassword = password
       ? await hashPassword(password)
@@ -163,7 +193,7 @@ export class AuthPrismaService extends PrismaClient implements OnModuleInit {
         cover_photo_path: staffUpdateRequest.cover_photo_path,
         bio: staffUpdateRequest.bio,
         position: { connect: { id: staffUpdateRequest.position_id } },
-        update_by_id: staffUpdateRequest.updated_by_id,
+        updated_by_id: staffUpdateRequest.updated_by_id,
       },
     });
 
@@ -185,5 +215,115 @@ export class AuthPrismaService extends PrismaClient implements OnModuleInit {
 
     delete deletedStaff.password;
     return deletedStaff;
+  }
+
+  async createStaffPosition(
+    staffPositionCreateRequest: StaffPositionCreateRequest,
+  ) {
+    const { name, description, created_by_id } = staffPositionCreateRequest;
+    const createdStaffPosition = await this.staffPosition.create({
+      data: {
+        name,
+        description,
+        created_by_id,
+        updated_by_id: created_by_id,
+      },
+    });
+
+    return createdStaffPosition;
+  }
+
+  async getOneStaffPosition(
+    staffPositionGetOneRequest: StaffPositionGetOneRequest,
+  ) {
+    const { id } = staffPositionGetOneRequest;
+    return await this.validateStaffPositionExistence(id);
+  }
+
+  async getListStaffPosition(
+    staffPositionListRequest: StaffPositionListRequest,
+  ) {
+    const { sort, range, filter } = staffPositionListRequest;
+    const fields = Object.keys(Prisma.StaffPositionScalarFieldEnum);
+    const parsedSort = validateSort(sort, fields);
+    const parsedRange = validateRange(range);
+    const parsedFilter = validateFilter(filter, fields);
+    const queryOptions: Prisma.StaffPositionFindManyArgs = {
+      where: { deleted_at: null },
+    };
+    if (parsedSort) {
+      const [field, order] = parsedSort;
+      queryOptions.orderBy = { [field]: order };
+    }
+
+    if (parsedRange) {
+      queryOptions.skip = parsedRange[0];
+      queryOptions.take = parsedRange[1] - parsedRange[0];
+    }
+
+    if (parsedFilter && Object.keys(parsedFilter).length > 0) {
+      const filterConditions: Record<string, any> = {};
+      for (const key in parsedFilter) {
+        if (key in parsedFilter) {
+          const filterValue = parsedFilter[key];
+          if (key === 'id' && Array.isArray(filterValue)) {
+            filterConditions[key] = { in: filterValue };
+          } else if (typeof filterValue === 'string') {
+            filterConditions[key] = {
+              contains: filterValue,
+              mode: 'insensitive',
+            };
+          } else {
+            filterConditions[key] = filterValue;
+          }
+        }
+      }
+
+      queryOptions.where = {
+        ...queryOptions.where,
+        ...filterConditions,
+      };
+    }
+
+    const staffPositions = await this.staffPosition.findMany(queryOptions);
+    const totalCount = await this.staffPosition.count({
+      where: queryOptions.where,
+      skip: queryOptions.skip,
+      take: queryOptions.take,
+    });
+    return { staffPositions, totalCount };
+  }
+
+  async updateStaffPosition(
+    staffPositionUpdateRequest: StaffPositionUpdateRequest,
+  ) {
+    const { id, name, description, updated_by_id } = staffPositionUpdateRequest;
+
+    await this.validateStaffPositionExistence(id);
+
+    const updatedStaffPosition = await this.staffPosition.update({
+      where: { id },
+      data: {
+        name,
+        description,
+        updated_by_id,
+      },
+    });
+
+    return updatedStaffPosition;
+  }
+
+  async deleteStaffPosition(
+    staffPositionDeleteRequest: StaffPositionDeleteRequest,
+  ) {
+    const { id } = staffPositionDeleteRequest;
+    await this.validateStaffPositionExistence(id);
+    const deletedStaffPosition = await this.staffPosition.update({
+      where: { id },
+      data: {
+        deleted_at: new Date(),
+      },
+    });
+    return deletedStaffPosition;
   }
 }

@@ -1,6 +1,6 @@
 ## Create migrate file
 ```
-npx prisma generate --schema=databases/auth/schema.prisma
+npx prisma migrate dev --schema=databases/auth/schema.prisma
 ```
 
 ## Reset DB

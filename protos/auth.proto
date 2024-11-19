@@ -41,7 +41,7 @@ message Staff {
   optional google.protobuf.Timestamp updated_at = 13;
   optional google.protobuf.Timestamp deleted_at = 14;
   optional int32 created_by_id = 15;
-  optional int32 update_by_id = 16;
+  optional int32 updated_by_id = 16;
   optional int32 deleted_by_id = 17;
 }
 
@@ -101,4 +101,60 @@ service StaffService {
   rpc delete (StaffDeleteRequest) returns (StaffResponse);
   rpc getOne (StaffGetOneRequest) returns (StaffResponse);
   rpc getList (StaffListRequest) returns (StaffListResponse);
+}
+
+message StaffPosition {
+  int32 id = 1;
+  string name = 2;
+  optional string description = 3;
+  optional google.protobuf.Timestamp created_at = 4;
+  optional google.protobuf.Timestamp updated_at = 5;
+  optional google.protobuf.Timestamp deleted_at = 6;
+  optional int32 created_by_id = 7;
+  optional int32 updated_by_id = 8;
+  optional int32 deleted_by_id = 9;
+}
+
+message StaffPositionCreateRequest {
+  string name = 1;
+  optional string description = 2;
+  int32 created_by_id = 3;
+}
+
+message StaffPositionResponse {
+  StaffPosition data = 1;
+}
+
+message StaffPositionUpdateRequest {
+  string name = 1;
+  optional string description = 2;
+  int32 updated_by_id = 3;
+  int32 id = 4;
+}
+
+message StaffPositionDeleteRequest {
+  int32 id = 1;
+}
+
+message StaffPositionListRequest {
+  optional string sort = 1; // ["field_name", "ASC/DESC"]
+  optional string range = 2;  // [start, end]
+  optional string filter = 3; // {"field": "value", "field2": "value2"}
+}
+
+message StaffPositionGetOneRequest {
+  int32 id = 1;
+}
+
+message StaffPositionListResponse {
+  repeated StaffPosition data = 1;
+  int32 total_count = 2;
+}
+
+service StaffPositionService {
+  rpc create (StaffPositionCreateRequest) returns (StaffPositionResponse);
+  rpc update (StaffPositionUpdateRequest) returns (StaffPositionResponse);
+  rpc delete (StaffPositionDeleteRequest) returns (StaffPositionResponse);
+  rpc getOne (StaffPositionGetOneRequest) returns (StaffPositionResponse);
+  rpc getList (StaffPositionListRequest) returns (StaffPositionListResponse);
 }
