@@ -37,12 +37,12 @@ export class CustomValidationPipe implements PipeTransform<any> {
     errors.forEach((err) => {
       const constraints = err.constraints;
       if (constraints) {
-        formattedErrors[err.property] = Object.values(constraints);
+        formattedErrors[err.property] = Object.values(constraints)[0];
       }
     });
     return {
       statusCode: HttpStatus.BAD_REQUEST,
-      message: formattedErrors,
+      errors: formattedErrors,
     };
   }
 }

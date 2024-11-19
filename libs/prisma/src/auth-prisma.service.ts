@@ -32,7 +32,7 @@ export class AuthPrismaService extends PrismaClient implements OnModuleInit {
     if (existingStaff) {
       throw new RpcException({
         code: grpc.status.INVALID_ARGUMENT,
-        message: JSON.stringify({ email: ['email must be unique'] }),
+        message: JSON.stringify({ email: 'email must be unique' }),
       });
     }
   }
@@ -46,7 +46,7 @@ export class AuthPrismaService extends PrismaClient implements OnModuleInit {
       throw new RpcException({
         code: grpc.status.INVALID_ARGUMENT,
         message: JSON.stringify({
-          position_id: ['position_id does not exist'],
+          position_id: 'position_id does not exist',
         }),
       });
     }
