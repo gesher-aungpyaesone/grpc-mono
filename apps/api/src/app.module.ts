@@ -3,7 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthClientModule } from '@app/auth-client';
 import { ConfigModule } from '@nestjs/config';
-import { StaffModule, StaffPositionModule } from './auth';
+import { StaffAuthModule, StaffModule, StaffPositionModule } from './auth';
 
 @Module({
   imports: [
@@ -11,6 +11,7 @@ import { StaffModule, StaffPositionModule } from './auth';
       isGlobal: true,
     }),
     AuthClientModule,
+    StaffAuthModule,
     StaffPositionModule,
     StaffModule,
   ],

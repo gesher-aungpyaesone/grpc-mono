@@ -65,6 +65,20 @@ export class AuthPrismaService extends PrismaClient implements OnModuleInit {
     return position;
   }
 
+  private async validateStaffExistenceByEmail(email: string): Promise<Staff> {
+    const existingStaff = await this.staff.findUnique({
+      where: { email },
+    });
+
+    if (!existingStaff || (existingStaff && existingStaff.deleted_at))
+      throw new RpcException({
+        code: grpc.status.NOT_FOUND,
+        message: 'staff not found',
+      });
+
+    return existingStaff;
+  }
+
   private async validateStaffExistence(staff_id: number): Promise<Staff> {
     const existingStaff = await this.staff.findUnique({
       where: { id: staff_id },
@@ -110,6 +124,10 @@ export class AuthPrismaService extends PrismaClient implements OnModuleInit {
     delete createdStaff.deleted_at;
 
     return createdStaff;
+  }
+
+  async getOneStaffByEmail(email: string) {
+    return await this.validateStaffExistenceByEmail(email);
   }
 
   async getOneStaff(staffGetOneRequest: StaffGetOneRequest) {

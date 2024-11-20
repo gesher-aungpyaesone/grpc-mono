@@ -31,8 +31,6 @@ export class CustomValidationPipe implements PipeTransform<any> {
   }
 
   private formatErrors(errors: any[]) {
-    
-    console.log('errors', errors);
     const formattedErrors = {};
     errors.forEach((err) => {
       const constraints = err.constraints;

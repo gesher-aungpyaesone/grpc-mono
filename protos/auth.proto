@@ -158,3 +158,27 @@ service StaffPositionService {
   rpc getOne (StaffPositionGetOneRequest) returns (StaffPositionResponse);
   rpc getList (StaffPositionListRequest) returns (StaffPositionListResponse);
 }
+
+message StaffLoginRequest {
+  string email = 1;
+  string password = 2;
+  bool remember_me = 3;
+}
+
+message StaffLoginResponse {
+  string access_token = 1;
+}
+
+message StaffValidateRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message StaffValidateResponse {
+  Staff data = 1;
+}
+
+service StaffAuthService {
+  rpc login (StaffLoginRequest) returns (StaffLoginResponse);
+  rpc validate (StaffValidateRequest) returns (StaffValidateResponse);
+}
