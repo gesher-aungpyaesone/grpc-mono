@@ -77,7 +77,8 @@ export class StaffController implements OnModuleInit {
 
   @Delete(':id')
   delete(@Param('id') id: number): Observable<StaffResponse> {
-    return this.staffService.delete({ id: +id }).pipe(
+    return this.staffService.delete({ id: +id, deleted_by_id: 1 }).pipe(
+      // TODO: update deleted by id
       catchError((error) => {
         throw handleError(error);
       }),

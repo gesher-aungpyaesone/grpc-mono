@@ -222,12 +222,13 @@ export class AuthPrismaService extends PrismaClient implements OnModuleInit {
   }
 
   async deleteStaff(staffDeleteRequest: StaffDeleteRequest) {
-    const { id } = staffDeleteRequest;
+    const { id, deleted_by_id } = staffDeleteRequest;
     await this.validateStaffExistence(id);
     const deletedStaff = await this.staff.update({
       where: { id },
       data: {
         deleted_at: new Date(),
+        deleted_by_id,
       },
     });
 
@@ -334,12 +335,13 @@ export class AuthPrismaService extends PrismaClient implements OnModuleInit {
   async deleteStaffPosition(
     staffPositionDeleteRequest: StaffPositionDeleteRequest,
   ) {
-    const { id } = staffPositionDeleteRequest;
+    const { id, deleted_by_id } = staffPositionDeleteRequest;
     await this.validateStaffPositionExistence(id);
     const deletedStaffPosition = await this.staffPosition.update({
       where: { id },
       data: {
         deleted_at: new Date(),
+        deleted_by_id,
       },
     });
     return deletedStaffPosition;
