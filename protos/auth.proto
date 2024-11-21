@@ -25,6 +25,38 @@ enum TokenType {
   VERIFY = 1;
 }
 
+message User {
+  int32 id = 1;
+  SystemUserType type = 2;
+  optional Staff staff = 3;
+}
+
+
+message UserResponse {
+  User data = 1;
+}
+
+message UserListRequest {
+  optional string sort = 1; // ["field_name", "ASC/DESC"]
+  optional string range = 2;  // [start, end]
+  optional string filter = 3; // {"field": "value", "field2": "value2"}
+}
+
+message UserGetOneRequest {
+  int32 id = 1;
+}
+
+message UserListResponse {
+  repeated User data = 1;
+  int32 total_count = 2;
+}
+
+
+service UserService {
+  rpc getOne (UserGetOneRequest) returns (UserResponse);
+  rpc getList (UserListRequest) returns (UserListResponse);
+}
+
 message Staff {
   int32 id = 1;
   int32 user_id = 2;
