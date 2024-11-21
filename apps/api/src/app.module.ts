@@ -7,6 +7,7 @@ import {
   PermissionModule,
   StaffAuthModule,
   StaffModule,
+  StaffPermissionModule,
   StaffPositionModule,
   UserModule,
 } from './auth';
@@ -22,6 +23,7 @@ import {
     StaffAuthModule,
     StaffPositionModule,
     StaffModule,
+    StaffPermissionModule,
   ],
   controllers: [AppController],
   providers: [AppService],

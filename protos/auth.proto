@@ -267,3 +267,23 @@ service PermissionService {
   rpc getOne (PermissionGetOneRequest) returns (PermissionResponse);
   rpc getList (PermissionListRequest) returns (PermissionListResponse);
 }
+
+message StaffPermissionAssignRequest {
+  int32 staff_id = 1;
+  repeated int32 permission_ids = 2;
+  int32 created_by_id = 3;
+}
+
+message StaffPermissionListByStaffRequest {
+  int32 staff_id = 1;
+}
+
+message StaffPermissionListResponse {
+  repeated StaffPermission data = 1;
+  int32 total_count = 2;
+}
+
+service StaffPermissionService {
+  rpc assign (StaffPermissionAssignRequest) returns (StaffPermissionListResponse);
+  rpc getListByStaff (StaffPermissionListByStaffRequest) returns (StaffPermissionListResponse);
+}

@@ -16,6 +16,8 @@ import {
   StaffDeleteRequest,
   StaffGetOneRequest,
   StaffListRequest,
+  StaffPermissionAssignRequest,
+  StaffPermissionListByStaffRequest,
   StaffPositionCreateRequest,
   StaffPositionDeleteRequest,
   StaffPositionGetOneRequest,
@@ -70,6 +72,25 @@ export class AuthPrismaService extends PrismaClient implements OnModuleInit {
     }
 
     return permission;
+  }
+
+  private async validatePermissionsExistence(
+    permission_ids: number[],
+  ): Promise<Permission[]> {
+    const permissions = await this.permission.findMany({
+      where: {
+        id: { in: permission_ids },
+      },
+      include: { type: true, resource: true },
+    });
+    if (permissions.length !== permission_ids.length) {
+      throw new RpcException({
+        code: grpc.status.NOT_FOUND,
+        message: 'One or more permissions not found',
+      });
+    }
+
+    return permissions;
   }
 
   private async validateStaffPositionExistence(
@@ -496,5 +517,71 @@ export class AuthPrismaService extends PrismaClient implements OnModuleInit {
       },
     });
     return deletedStaffPosition;
+  }
+
+  async getListStaffPermissionByStaff(
+    staffPermissionListByStaffRequest: StaffPermissionListByStaffRequest,
+  ) {
+    const { staff_id } = staffPermissionListByStaffRequest;
+    const staff = await this.staff.findUnique({
+      where: { id: staff_id },
+      select: {
+        deleted_at: true,
+        staff_permissions: {
+          include: {
+            permission: {
+              include: { resource: true, type: true },
+            },
+          },
+        },
+      },
+    });
+
+    if (!staff || (staff && staff.deleted_at))
+      throw new RpcException({
+        code: grpc.status.NOT_FOUND,
+        message: 'staff not found',
+      });
+
+    return staff.staff_permissions;
+  }
+
+  async assignStaffPermission(
+    staffPermissionAssignRequest: StaffPermissionAssignRequest,
+  ) {
+    const { staff_id, permission_ids, created_by_id } =
+      staffPermissionAssignRequest;
+    await this.validateStaffExistence(staff_id);
+    await this.validatePermissionsExistence(permission_ids);
+
+    const existingAssignments = await this.staffPermission.findMany({
+      where: {
+        staff_id,
+        permission_id: { in: permission_ids },
+      },
+      select: { permission_id: true },
+    });
+
+    const alreadyAssignedPermissionIds = existingAssignments.map(
+      (assignment) => assignment.permission_id,
+    );
+
+    const permissionsToAssign = permission_ids.filter(
+      (permission_id) => !alreadyAssignedPermissionIds.includes(permission_id),
+    );
+
+    if (permissionsToAssign.length) {
+      const staffPermissions = permissionsToAssign.map((permission_id) => ({
+        staff_id,
+        permission_id,
+        created_by_id,
+      }));
+
+      await this.staffPermission.createMany({
+        data: staffPermissions,
+      });
+    }
+
+    return await this.getListStaffPermissionByStaff({ staff_id });
   }
 }

@@ -8,6 +8,7 @@ import { StaffPositionModule } from './staff-position/staff-position.module';
 import { StaffAuthModule } from './staff-auth/staff-auth.module';
 import { UserModule } from './user/user.module';
 import { PermissionModule } from './permission/permission.module';
+import { StaffPermissionModule } from './staff-permission/staff-permission.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { PermissionModule } from './permission/permission.module';
     StaffAuthModule,
     UserModule,
     PermissionModule,
+    StaffPermissionModule,
   ],
   controllers: [AuthController],
   providers: [AuthService],
