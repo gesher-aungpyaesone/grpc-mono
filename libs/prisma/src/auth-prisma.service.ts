@@ -1,6 +1,7 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
 import {
+  Permission,
   Prisma,
   PrismaClient,
   Staff,
@@ -9,6 +10,8 @@ import {
   User,
 } from '@prisma/auth-ms';
 import {
+  PermissionGetOneRequest,
+  PermissionListRequest,
   StaffCreateRequest,
   StaffDeleteRequest,
   StaffGetOneRequest,
@@ -49,6 +52,24 @@ export class AuthPrismaService extends PrismaClient implements OnModuleInit {
         message: JSON.stringify({ email: 'email must be unique' }),
       });
     }
+  }
+
+  private async validatePermissionExistence(
+    permission_id: number,
+  ): Promise<Permission> {
+    const permission = await this.permission.findUnique({
+      where: { id: permission_id },
+      include: { type: true, resource: true },
+    });
+
+    if (!permission) {
+      throw new RpcException({
+        code: grpc.status.NOT_FOUND,
+        message: 'permission not found',
+      });
+    }
+
+    return permission;
   }
 
   private async validateStaffPositionExistence(
@@ -109,6 +130,62 @@ export class AuthPrismaService extends PrismaClient implements OnModuleInit {
       });
 
     return existingUser;
+  }
+
+  async getOnePermission(permissionGetOneRequest: PermissionGetOneRequest) {
+    const { id } = permissionGetOneRequest;
+    return await this.validatePermissionExistence(id);
+  }
+
+  async getListPermission(permissionListRequest: PermissionListRequest) {
+    const { sort, range, filter } = permissionListRequest;
+    const fields = Object.keys(Prisma.PermissionScalarFieldEnum);
+    const parsedSort = validateSort(sort, fields);
+    const parsedRange = validateRange(range);
+    const parsedFilter = validateFilter(filter, fields);
+    const queryOptions: Prisma.PermissionFindManyArgs = {
+      include: { type: true, resource: true },
+    };
+    if (parsedSort) {
+      const [field, order] = parsedSort;
+      queryOptions.orderBy = { [field]: order };
+    }
+
+    if (parsedRange) {
+      queryOptions.skip = parsedRange[0];
+      queryOptions.take = parsedRange[1] - parsedRange[0];
+    }
+    if (parsedFilter && Object.keys(parsedFilter).length > 0) {
+      const filterConditions: Record<string, any> = {};
+      for (const key in parsedFilter) {
+        if (key in parsedFilter) {
+          const filterValue = parsedFilter[key];
+          if (key === 'id' && Array.isArray(filterValue)) {
+            filterConditions[key] = { in: filterValue };
+          } else if (typeof filterValue === 'string') {
+            filterConditions[key] = {
+              contains: filterValue,
+              mode: 'insensitive',
+            };
+          } else {
+            filterConditions[key] = filterValue;
+          }
+        }
+      }
+
+      queryOptions.where = {
+        ...queryOptions.where,
+        ...filterConditions,
+      };
+    }
+
+    const permissions = await this.permission.findMany(queryOptions);
+    const totalCount = await this.permission.count({
+      where: queryOptions.where,
+      skip: queryOptions.skip,
+      take: queryOptions.take,
+    });
+    return { permissions, totalCount };
   }
 
   async getOneUser(userGetOneRequest: UserGetOneRequest) {

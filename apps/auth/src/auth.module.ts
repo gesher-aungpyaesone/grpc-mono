@@ -7,6 +7,7 @@ import { PrismaModule } from '@app/prisma';
 import { StaffPositionModule } from './staff-position/staff-position.module';
 import { StaffAuthModule } from './staff-auth/staff-auth.module';
 import { UserModule } from './user/user.module';
+import { PermissionModule } from './permission/permission.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { UserModule } from './user/user.module';
     StaffPositionModule,
     StaffAuthModule,
     UserModule,
+    PermissionModule,
   ],
   controllers: [AuthController],
   providers: [AuthService],

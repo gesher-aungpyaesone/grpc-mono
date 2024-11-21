@@ -57,6 +57,33 @@ service UserService {
   rpc getList (UserListRequest) returns (UserListResponse);
 }
 
+message PermissionType {
+  int32 id = 1;
+  string name = 2;
+  optional string description = 3;
+}
+
+message PermissionResource {
+  int32 id = 1;
+  string name = 2;
+  optional string description = 3;
+}
+
+message Permission {
+  int32 id = 1;
+  optional PermissionType type = 2;
+  optional PermissionResource resource = 3;
+  string name = 4;
+  optional string description = 5;
+}
+
+message StaffPermission {
+  int32 id = 1;
+  optional Permission permission = 2;
+  int32 created_by_id = 3;
+  optional google.protobuf.Timestamp created_at = 4;
+}
+
 message Staff {
   int32 id = 1;
   int32 user_id = 2;
@@ -215,4 +242,28 @@ message StaffValidateResponse {
 service StaffAuthService {
   rpc login (StaffLoginRequest) returns (StaffLoginResponse);
   rpc validate (StaffValidateRequest) returns (StaffValidateResponse);
+}
+
+message PermissionResponse {
+  Permission data = 1;
+}
+
+message PermissionListRequest {
+  optional string sort = 1; // ["field_name", "ASC/DESC"]
+  optional string range = 2;  // [start, end]
+  optional string filter = 3; // {"field": "value", "field2": "value2"}
+}
+
+message PermissionGetOneRequest {
+  int32 id = 1;
+}
+
+message PermissionListResponse {
+  repeated Permission data = 1;
+  int32 total_count = 2;
+}
+
+service PermissionService {
+  rpc getOne (PermissionGetOneRequest) returns (PermissionResponse);
+  rpc getList (PermissionListRequest) returns (PermissionListResponse);
 }

@@ -28,13 +28,14 @@ model User {
 
 model StaffPosition {
     id            Int       @id @default(autoincrement())
+    is_root       Boolean   @default(false)
     name          String    @db.VarChar(255)
-    description   String?    @db.Text
+    description   String?   @db.Text
     created_at    DateTime  @default(now())
     updated_at    DateTime  @updatedAt
     deleted_at    DateTime?
     created_by_id Int
-    updated_by_id  Int
+    updated_by_id Int
     deleted_by_id Int?
     staffs        Staff[]
 
@@ -42,26 +43,27 @@ model StaffPosition {
 }
 
 model Staff {
-    id               Int           @id @default(autoincrement())
-    user             User          @relation(fields: [user_id], references: [id])
-    user_id          Int           @unique
-    first_name       String        @db.VarChar(255)
-    last_name        String        @db.VarChar(255)
-    email            String        @unique @db.VarChar(255)
-    password         String        @db.VarChar(255)
-    department       String        @db.VarChar(255)
-    position         StaffPosition @relation(fields: [position_id], references: [id])
-    position_id      Int
-    profile_path     String?       @db.VarChar(255)
-    cover_photo_path String?       @db.VarChar(255)
-    bio              String?       @db.Text
-    created_at       DateTime      @default(now())
-    updated_at       DateTime      @updatedAt
-    deleted_at       DateTime?
-    created_by_id    Int
+    id                Int               @id @default(autoincrement())
+    user              User              @relation(fields: [user_id], references: [id])
+    user_id           Int               @unique
+    first_name        String            @db.VarChar(255)
+    last_name         String            @db.VarChar(255)
+    email             String            @unique @db.VarChar(255)
+    password          String            @db.VarChar(255)
+    department        String            @db.VarChar(255)
+    position          StaffPosition     @relation(fields: [position_id], references: [id])
+    position_id       Int
+    profile_path      String?           @db.VarChar(255)
+    cover_photo_path  String?           @db.VarChar(255)
+    bio               String?           @db.Text
+    created_at        DateTime          @default(now())
+    updated_at        DateTime          @updatedAt
+    deleted_at        DateTime?
+    created_by_id     Int
     updated_by_id     Int
-    deleted_by_id    Int?
-    tokens           StaffToken[]
+    deleted_by_id     Int?
+    tokens            StaffToken[]
+    staff_permissions StaffPermission[]
 
     @@map("staffs")
 }
@@ -76,4 +78,56 @@ model StaffToken {
     created_at DateTime  @default(now())
 
     @@map("staff_tokens")
+}
+
+model PermissionResource {
+    id          Int          @id @default(autoincrement())
+    name        String       @unique @db.VarChar(255)
+    description String?      @db.Text
+    created_at  DateTime     @default(now())
+    updated_at  DateTime     @updatedAt
+    deleted_at  DateTime?
+    permissions Permission[]
+
+    @@map("permission_resources")
+}
+
+model PermissionType {
+    id          Int          @id @default(autoincrement())
+    name        String       @unique @db.VarChar(255)
+    description String?      @db.Text
+    created_at  DateTime     @default(now())
+    updated_at  DateTime     @updatedAt
+    deleted_at  DateTime?
+    permissions Permission[]
+
+    @@map("permission_types")
+}
+
+model Permission {
+    id                Int                @id @default(autoincrement())
+    type              PermissionType     @relation(fields: [type_id], references: [id])
+    type_id           Int
+    resource          PermissionResource @relation(fields: [resource_id], references: [id])
+    resource_id       Int
+    name              String             @db.VarChar(255)
+    description       String?            @db.Text
+    created_at        DateTime           @default(now())
+    updated_at        DateTime           @updatedAt
+    deleted_at        DateTime?
+    staff_permissions StaffPermission[]
+
+    @@map("permissions")
+}
+
+model StaffPermission {
+    id            Int        @id @default(autoincrement())
+    staff         Staff      @relation(fields: [staff_id], references: [id])
+    staff_id      Int
+    permission    Permission @relation(fields: [permission_id], references: [id])
+    permission_id Int
+    created_at    DateTime   @default(now())
+    created_by_id Int
+
+    @@map("staff_permissions")
 }

@@ -36,7 +36,53 @@ async function main() {
     },
   });
 
-  console.log('Initial staff created:', staff);
+  const permissionTypes = ['CREATE', 'READ', 'UPDATE', 'DELETE'];
+  for (const type of permissionTypes) {
+    await prisma.permissionType.create({
+      data: { name: type },
+    });
+  }
+
+  const permissionResource = await prisma.permissionResource.create({
+    data: { name: 'staff' },
+  });
+
+  const staffPermissions = [
+    {
+      name: 'Create Staff',
+      permissionType: 'CREATE',
+      resource: permissionResource,
+    },
+    {
+      name: 'Read Staff',
+      permissionType: 'READ',
+      resource: permissionResource,
+    },
+    {
+      name: 'Update Staff',
+      permissionType: 'UPDATE',
+      resource: permissionResource,
+    },
+    {
+      name: 'Delete Staff',
+      permissionType: 'DELETE',
+      resource: permissionResource,
+    },
+  ];
+
+  for (const perm of staffPermissions) {
+    const permissionType = await prisma.permissionType.findUnique({
+      where: { name: perm.permissionType },
+    });
+
+    await prisma.permission.create({
+      data: {
+        name: perm.name,
+        type: { connect: { id: permissionType.id } },
+        resource: { connect: { id: permissionResource.id } },
+      },
+    });
+  }
 }
 
 main()

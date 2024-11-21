@@ -4,6 +4,7 @@ import { AppService } from './app.service';
 import { AuthClientModule } from '@app/auth-client';
 import { ConfigModule } from '@nestjs/config';
 import {
+  PermissionModule,
   StaffAuthModule,
   StaffModule,
   StaffPositionModule,
@@ -16,6 +17,7 @@ import {
       isGlobal: true,
     }),
     AuthClientModule,
+    PermissionModule,
     UserModule,
     StaffAuthModule,
     StaffPositionModule,
