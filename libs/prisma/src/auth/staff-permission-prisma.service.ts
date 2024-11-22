@@ -1,34 +1,29 @@
-import { OnModuleDestroy, OnModuleInit } from '@nestjs/common';
+import { Inject } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
-import { PrismaClient } from '@prisma/auth-ms';
 import * as grpc from '@grpc/grpc-js';
 import {
   StaffPermissionAssignRequest,
   StaffPermissionListByStaffRequest,
 } from 'protos/dist/auth';
 import { PermissionService } from './permission-prisma.service';
+import { StaffService } from './staff-prisma.service';
+import { AuthPrismaService } from './auth-prisma.service';
 
-export class StaffPermissionService
-  extends PrismaClient
-  implements OnModuleInit, OnModuleDestroy
-{
-  constructor(private readonly permissionService: PermissionService) {
-    super({ log: ['query', 'info', 'warn', 'error'] });
-  }
-
-  async onModuleInit() {
-    await this.$connect();
-  }
-
-  async onModuleDestroy() {
-    await this.$disconnect();
-  }
+export class StaffPermissionService {
+  constructor(
+    @Inject()
+    private prisma: AuthPrismaService,
+    @Inject()
+    private readonly staffService: StaffService,
+    @Inject()
+    private readonly permissionService: PermissionService,
+  ) {}
 
   async getListStaffPermissionByStaff(
     staffPermissionListByStaffRequest: StaffPermissionListByStaffRequest,
   ) {
     const { staff_id } = staffPermissionListByStaffRequest;
-    const staff = await this.staff.findUnique({
+    const staff = await this.prisma.staff.findUnique({
       where: { id: staff_id },
       select: {
         deleted_at: true,
@@ -56,10 +51,10 @@ export class StaffPermissionService
   ) {
     const { staff_id, permission_ids, created_by_id } =
       staffPermissionAssignRequest;
-    // await this.validateStaffExistence(staff_id);
+    await this.staffService.validateStaffExistence(staff_id);
     await this.permissionService.validatePermissionsExistence(permission_ids);
 
-    const existingAssignments = await this.staffPermission.findMany({
+    const existingAssignments = await this.prisma.staffPermission.findMany({
       where: {
         staff_id,
         permission_id: { in: permission_ids },
@@ -82,7 +77,7 @@ export class StaffPermissionService
         created_by_id,
       }));
 
-      await this.staffPermission.createMany({
+      await this.prisma.staffPermission.createMany({
         data: staffPermissions,
       });
     }

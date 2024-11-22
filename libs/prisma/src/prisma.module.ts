@@ -1,5 +1,6 @@
 import { Global, Module } from '@nestjs/common';
 import {
+  AuthPrismaService,
   PermissionService,
   StaffPermissionService,
   StaffPositionService,
@@ -10,6 +11,7 @@ import {
 @Global()
 @Module({
   providers: [
+    AuthPrismaService,
     UserService,
     PermissionService,
     StaffPositionService,

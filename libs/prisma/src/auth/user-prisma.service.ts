@@ -1,28 +1,19 @@
-import { OnModuleDestroy, OnModuleInit } from '@nestjs/common';
+import { Inject } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
-import { User, Prisma, PrismaClient } from '@prisma/auth-ms';
+import { User, Prisma } from '@prisma/auth-ms';
 import * as grpc from '@grpc/grpc-js';
 import { validateFilter, validateRange, validateSort } from 'utils';
 import { UserGetOneRequest, UserListRequest } from 'protos/dist/auth';
+import { AuthPrismaService } from './auth-prisma.service';
 
-export class UserService
-  extends PrismaClient
-  implements OnModuleInit, OnModuleDestroy
-{
-  constructor() {
-    super({ log: ['query', 'info', 'warn', 'error'] });
-  }
-
-  async onModuleInit() {
-    await this.$connect();
-  }
-
-  async onModuleDestroy() {
-    await this.$disconnect();
-  }
+export class UserService {
+  constructor(
+    @Inject()
+    private prisma: AuthPrismaService,
+  ) {}
 
   async validateUserExistence(user_id: number): Promise<User> {
-    const existingUser = await this.user.findUnique({
+    const existingUser = await this.prisma.user.findUnique({
       where: { id: user_id },
       include: { staff: true },
     });
@@ -83,11 +74,9 @@ export class UserService
       };
     }
 
-    const users = await this.user.findMany(queryOptions);
-    const totalCount = await this.user.count({
+    const users = await this.prisma.user.findMany(queryOptions);
+    const totalCount = await this.prisma.user.count({
       where: queryOptions.where,
-      skip: queryOptions.skip,
-      take: queryOptions.take,
     });
     return { users, totalCount };
   }

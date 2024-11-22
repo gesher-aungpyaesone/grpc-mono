@@ -1,33 +1,24 @@
-import { OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
-import { Permission, Prisma, PrismaClient } from '@prisma/auth-ms';
+import { Permission, Prisma } from '@prisma/auth-ms';
 import * as grpc from '@grpc/grpc-js';
 import { validateFilter, validateRange, validateSort } from 'utils';
 import {
   PermissionGetOneRequest,
   PermissionListRequest,
 } from 'protos/dist/auth';
+import { Inject } from '@nestjs/common';
+import { AuthPrismaService } from './auth-prisma.service';
 
-export class PermissionService
-  extends PrismaClient
-  implements OnModuleInit, OnModuleDestroy
-{
-  constructor() {
-    super({ log: ['query', 'info', 'warn', 'error'] });
-  }
-
-  async onModuleInit() {
-    await this.$connect();
-  }
-
-  async onModuleDestroy() {
-    await this.$disconnect();
-  }
+export class PermissionService {
+  constructor(
+    @Inject()
+    private prisma: AuthPrismaService,
+  ) {}
 
   async validatePermissionsExistence(
     permission_ids: number[],
   ): Promise<Permission[]> {
-    const permissions = await this.permission.findMany({
+    const permissions = await this.prisma.permission.findMany({
       where: {
         id: { in: permission_ids },
       },
@@ -46,7 +37,7 @@ export class PermissionService
   async validatePermissionExistence(
     permission_id: number,
   ): Promise<Permission> {
-    const permission = await this.permission.findUnique({
+    const permission = await this.prisma.permission.findUnique({
       where: { id: permission_id },
       include: { type: true, resource: true },
     });
@@ -108,11 +99,9 @@ export class PermissionService
       };
     }
 
-    const permissions = await this.permission.findMany(queryOptions);
-    const totalCount = await this.permission.count({
+    const permissions = await this.prisma.permission.findMany(queryOptions);
+    const totalCount = await this.prisma.permission.count({
       where: queryOptions.where,
-      skip: queryOptions.skip,
-      take: queryOptions.take,
     });
     return { permissions, totalCount };
   }

@@ -1,6 +1,6 @@
-import { OnModuleDestroy, OnModuleInit } from '@nestjs/common';
+import { Inject } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
-import { Staff, Prisma, PrismaClient } from '@prisma/auth-ms';
+import { Staff, Prisma, SystemUserType } from '@prisma/auth-ms';
 import * as grpc from '@grpc/grpc-js';
 import {
   hashPassword,
@@ -16,25 +16,20 @@ import {
   StaffUpdateRequest,
 } from 'protos/dist/auth';
 import { StaffPositionService } from './staff-position-prisma.service';
+import { AuthPrismaService } from './auth-prisma.service';
 
-export class StaffService
-  extends PrismaClient
-  implements OnModuleInit, OnModuleDestroy
-{
-  constructor(private readonly staffPositionService: StaffPositionService) {
-    super({ log: ['query', 'info', 'warn', 'error'] });
-  }
-
-  async onModuleInit() {
-    await this.$connect();
-  }
-
-  async onModuleDestroy() {
-    await this.$disconnect();
-  }
+export class StaffService {
+  constructor(
+    @Inject()
+    private prisma: AuthPrismaService,
+    @Inject()
+    private readonly staffPositionService: StaffPositionService,
+  ) {}
 
   async validateStaffEmailUniqueness(email: string): Promise<void> {
-    const existingStaff = await this.staff.findUnique({ where: { email } });
+    const existingStaff = await this.prisma.staff.findUnique({
+      where: { email },
+    });
 
     if (existingStaff) {
       throw new RpcException({
@@ -45,7 +40,7 @@ export class StaffService
   }
 
   async validateStaffExistenceByEmail(email: string): Promise<Staff> {
-    const existingStaff = await this.staff.findUnique({
+    const existingStaff = await this.prisma.staff.findUnique({
       where: { email },
     });
 
@@ -59,7 +54,7 @@ export class StaffService
   }
 
   async validateStaffExistence(staff_id: number): Promise<Staff> {
-    const existingStaff = await this.staff.findUnique({
+    const existingStaff = await this.prisma.staff.findUnique({
       where: { id: staff_id },
     });
 
@@ -80,7 +75,7 @@ export class StaffService
 
     const hashedPassword = await hashPassword(password);
 
-    const createdStaff = await this.staff.create({
+    const createdStaff = await this.prisma.staff.create({
       data: {
         user: {
           create: { type: SystemUserType.STAFF },
@@ -156,11 +151,9 @@ export class StaffService
       };
     }
 
-    const staffs = await this.staff.findMany(queryOptions);
-    const totalCount = await this.staff.count({
+    const staffs = await this.prisma.staff.findMany(queryOptions);
+    const totalCount = await this.prisma.staff.count({
       where: queryOptions.where,
-      skip: queryOptions.skip,
-      take: queryOptions.take,
     });
     return { staffs, totalCount };
   }
@@ -178,7 +171,7 @@ export class StaffService
       ? await hashPassword(password)
       : existingStaff.password;
 
-    const updatedStaff = await this.staff.update({
+    const updatedStaff = await this.prisma.staff.update({
       where: { id },
       data: {
         first_name: staffUpdateRequest.first_name,
@@ -203,7 +196,7 @@ export class StaffService
   async deleteStaff(staffDeleteRequest: StaffDeleteRequest) {
     const { id, deleted_by_id } = staffDeleteRequest;
     await this.validateStaffExistence(id);
-    const deletedStaff = await this.staff.update({
+    const deletedStaff = await this.prisma.staff.update({
       where: { id },
       data: {
         deleted_at: new Date(),
