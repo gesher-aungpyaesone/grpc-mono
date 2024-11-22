@@ -30,6 +30,14 @@ module.exports = {
         'skipBlankLines': true
       }
     ],
+    'max-lines': [
+      'error',
+      {
+        'max': 1000,
+        'skipComments': true,
+        'skipBlankLines': true
+      }
+    ],
     'complexity': ['error', { 'max': 10 }]
   },
 };
