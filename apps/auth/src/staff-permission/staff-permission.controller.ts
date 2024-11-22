@@ -1,4 +1,4 @@
-import { AuthPrismaService } from '@app/prisma';
+import { StaffPermissionService } from '@app/prisma/auth';
 import { Controller } from '@nestjs/common';
 import { GrpcMethod } from '@nestjs/microservices';
 import {
@@ -11,7 +11,7 @@ import { transformTimestamps } from 'utils';
 
 @Controller('staff-permission')
 export class StaffPermissionController {
-  constructor(private readonly prisma: AuthPrismaService) {}
+  constructor(private readonly prisma: StaffPermissionService) {}
 
   @GrpcMethod(STAFF_PERMISSION_SERVICE_NAME, 'assign') async assign(
     staffPermissionAssignRequest: StaffPermissionAssignRequest,

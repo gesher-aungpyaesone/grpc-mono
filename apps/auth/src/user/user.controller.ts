@@ -1,4 +1,4 @@
-import { AuthPrismaService } from '@app/prisma';
+import { UserService } from '@app/prisma/auth';
 import { Controller } from '@nestjs/common';
 import { GrpcMethod } from '@nestjs/microservices';
 import {
@@ -12,14 +12,11 @@ import { convertSystemUserTypeGrpcToPrisma } from 'utils';
 
 @Controller('user')
 export class UserController {
-  constructor(private readonly prisma: AuthPrismaService) {}
+  constructor(private readonly prisma: UserService) {}
 
   @GrpcMethod(USER_SERVICE_NAME, 'getOne')
   async getOne(userGetOneRequest: UserGetOneRequest): Promise<UserResponse> {
     const user = await this.prisma.getOneUser(userGetOneRequest);
-
-    console.log(user);
-
     return {
       data: { ...user, type: convertSystemUserTypeGrpcToPrisma(user.type) },
     };

@@ -10,12 +10,12 @@ import {
   StaffResponse,
   StaffUpdateRequest,
 } from 'protos/dist/auth';
-import { AuthPrismaService } from '@app/prisma/auth-prisma.service';
 import { transformTimestamps } from 'utils';
+import { StaffService } from '@app/prisma/auth';
 
 @Controller('staff')
 export class StaffController {
-  constructor(private readonly prisma: AuthPrismaService) {}
+  constructor(private readonly prisma: StaffService) {}
 
   @GrpcMethod(STAFF_SERVICE_NAME, 'create')
   async create(staffCreateRequest: StaffCreateRequest): Promise<StaffResponse> {

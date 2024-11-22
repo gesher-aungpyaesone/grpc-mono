@@ -1,4 +1,4 @@
-import { AuthPrismaService } from '@app/prisma';
+import { StaffPositionService } from '@app/prisma/auth';
 import { Controller } from '@nestjs/common';
 import { GrpcMethod } from '@nestjs/microservices';
 import {
@@ -15,7 +15,7 @@ import { transformTimestamps } from 'utils';
 
 @Controller('staff-position')
 export class StaffPositionController {
-  constructor(private readonly prisma: AuthPrismaService) {}
+  constructor(private readonly prisma: StaffPositionService) {}
   @GrpcMethod(STAFF_POSITION_SERVICE_NAME, 'create')
   async create(
     staffPositionCreateRequest: StaffPositionCreateRequest,

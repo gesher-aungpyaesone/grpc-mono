@@ -1,4 +1,4 @@
-import { AuthPrismaService } from '@app/prisma';
+import { PermissionService } from '@app/prisma/auth';
 import { Controller } from '@nestjs/common';
 import { GrpcMethod } from '@nestjs/microservices';
 import {
@@ -11,7 +11,7 @@ import {
 
 @Controller('permission')
 export class PermissionController {
-  constructor(private readonly prisma: AuthPrismaService) {}
+  constructor(private readonly prisma: PermissionService) {}
 
   @GrpcMethod(PERMISSION_SERVICE_NAME, 'getOne')
   async getOne(

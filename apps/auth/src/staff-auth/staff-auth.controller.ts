@@ -1,4 +1,4 @@
-import { AuthPrismaService } from '@app/prisma';
+import { StaffService } from '@app/prisma/auth';
 import { Controller } from '@nestjs/common';
 import { GrpcMethod } from '@nestjs/microservices';
 import {
@@ -10,7 +10,7 @@ import { comparePassword, transformTimestamps } from 'utils';
 
 @Controller('staff-auth')
 export class StaffAuthController {
-  constructor(private readonly prisma: AuthPrismaService) {}
+  constructor(private readonly prisma: StaffService) {}
 
   @GrpcMethod(STAFF_AUTH_SERVICE_NAME, 'validate')
   async validate(
