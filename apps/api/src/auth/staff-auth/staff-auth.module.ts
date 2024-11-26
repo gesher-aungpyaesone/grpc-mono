@@ -1,7 +1,9 @@
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { StaffAuthController } from './staff-auth.controller';
 import { JwtModule } from '@nestjs/jwt';
+import { StaffAuthService } from './staff-auth.service';
 
+@Global()
 @Module({
   imports: [
     JwtModule.register({
@@ -10,5 +12,7 @@ import { JwtModule } from '@nestjs/jwt';
     }),
   ],
   controllers: [StaffAuthController],
+  providers: [StaffAuthService],
+  exports: [StaffAuthService],
 })
 export class StaffAuthModule {}

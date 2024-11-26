@@ -23,6 +23,7 @@ async function main() {
 
   const staff = await prisma.staff.create({
     data: {
+      is_root: true,
       user_id: user.id,
       first_name: 'APS',
       last_name: 'DEV',
@@ -36,7 +37,7 @@ async function main() {
     },
   });
 
-  const permissionTypes = ['CREATE', 'READ', 'UPDATE', 'DELETE'];
+  const permissionTypes = ['create', 'show', 'list', 'edit', 'delete', 'export'];
   for (const type of permissionTypes) {
     await prisma.permissionType.create({
       data: { name: type },
@@ -50,22 +51,32 @@ async function main() {
   const staffPermissions = [
     {
       name: 'Create Staff',
-      permissionType: 'CREATE',
+      permissionType: 'create',
       resource: permissionResource,
     },
     {
-      name: 'Read Staff',
-      permissionType: 'READ',
+      name: 'Show Staff',
+      permissionType: 'show',
       resource: permissionResource,
     },
     {
-      name: 'Update Staff',
-      permissionType: 'UPDATE',
+      name: 'List Staff',
+      permissionType: 'list',
+      resource: permissionResource,
+    },
+    {
+      name: 'Edit Staff',
+      permissionType: 'edit',
       resource: permissionResource,
     },
     {
       name: 'Delete Staff',
-      permissionType: 'DELETE',
+      permissionType: 'delete',
+      resource: permissionResource,
+    },
+    {
+      name: 'Export Staff',
+      permissionType: 'export',
       resource: permissionResource,
     },
   ];

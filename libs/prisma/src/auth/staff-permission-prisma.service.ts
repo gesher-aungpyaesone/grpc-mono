@@ -42,7 +42,6 @@ export class StaffPermissionService {
         code: grpc.status.NOT_FOUND,
         message: 'staff not found',
       });
-
     return staff.staff_permissions;
   }
 

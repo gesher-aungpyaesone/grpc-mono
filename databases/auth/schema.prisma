@@ -28,7 +28,6 @@ model User {
 
 model StaffPosition {
     id            Int       @id @default(autoincrement())
-    is_root       Boolean   @default(false)
     name          String    @db.VarChar(255)
     description   String?   @db.Text
     created_at    DateTime  @default(now())
@@ -44,6 +43,7 @@ model StaffPosition {
 
 model Staff {
     id                Int               @id @default(autoincrement())
+    is_root           Boolean           @default(false)
     user              User              @relation(fields: [user_id], references: [id])
     user_id           Int               @unique
     first_name        String            @db.VarChar(255)

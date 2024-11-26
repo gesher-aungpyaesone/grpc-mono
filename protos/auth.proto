@@ -90,7 +90,7 @@ message Staff {
   string first_name = 3;
   string last_name = 4;
   string email = 5;
-  // optional string password = 6;
+  bool is_root = 6;
   string department = 7;
   int32 position_id = 8;
   optional string profile_path = 9;
@@ -228,6 +228,8 @@ message StaffLoginRequest {
 
 message StaffLoginResponse {
   string access_token = 1;
+  repeated StaffPermission permissions = 2;
+  bool is_root = 3;
 }
 
 message StaffValidateRequest {

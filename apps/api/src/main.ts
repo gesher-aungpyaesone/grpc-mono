@@ -33,6 +33,7 @@ async function bootstrap() {
     .setTitle('Gesher Station APIs')
     .setDescription('API gateway for Gesher Station')
     .setVersion('1.0')
+    .addBearerAuth()
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
 
