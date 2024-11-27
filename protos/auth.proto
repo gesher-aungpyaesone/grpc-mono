@@ -230,6 +230,16 @@ message StaffLoginResponse {
   string access_token = 1;
   repeated StaffPermission permissions = 2;
   bool is_root = 3;
+  Staff staff = 4;
+}
+
+message StaffGetMeResponse {
+  repeated StaffPermission permissions = 1;
+  bool is_root = 2;
+  Staff staff = 3;
+}
+
+message StaffGetMeRequest {
 }
 
 message StaffValidateRequest {
@@ -244,6 +254,7 @@ message StaffValidateResponse {
 service StaffAuthService {
   rpc login (StaffLoginRequest) returns (StaffLoginResponse);
   rpc validate (StaffValidateRequest) returns (StaffValidateResponse);
+  rpc getMe (StaffGetMeRequest) returns (StaffGetMeResponse);
 }
 
 message PermissionResponse {
