@@ -19,7 +19,7 @@ import { catchError, Observable } from 'rxjs';
 import { PermissionListDto } from './dto';
 import { handleError } from 'utils';
 import { ApiBearerAuth } from '@nestjs/swagger';
-import { AuthGuard } from '../../guard';
+import { StaffAuthGuard } from '../../guard';
 
 @Controller('permission')
 export class PermissionController implements OnModuleInit {
@@ -33,7 +33,7 @@ export class PermissionController implements OnModuleInit {
   }
 
   @ApiBearerAuth()
-  @UseGuards(AuthGuard)
+  @UseGuards(StaffAuthGuard)
   @Get(':id')
   getOne(@Param('id') id: number): Observable<PermissionResponse> {
     return this.permissionService.getOne({ id: +id }).pipe(
@@ -44,7 +44,7 @@ export class PermissionController implements OnModuleInit {
   }
 
   @ApiBearerAuth()
-  @UseGuards(AuthGuard)
+  @UseGuards(StaffAuthGuard)
   @Get()
   getList(
     @Query() staffPositionListDto: PermissionListDto,

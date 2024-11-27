@@ -14,6 +14,7 @@ import {
 import { ClientGrpc } from '@nestjs/microservices';
 import {
   AUTH_PACKAGE_NAME,
+  Staff,
   STAFF_SERVICE_NAME,
   StaffListResponse,
   StaffResponse,
@@ -23,8 +24,8 @@ import { Observable, catchError } from 'rxjs';
 import { StaffCreateDto, StaffListDto, StaffUpdateDto } from './dto';
 import { handleError } from 'utils';
 import { ApiBearerAuth } from '@nestjs/swagger';
-import { AuthGuard } from '../../guard';
-import { StaffPermissionDecorator } from '../../decorator';
+import { StaffAuthGuard } from '../../guard';
+import { LoggedinStaff, StaffPermissionDecorator } from '../../decorator';
 
 @Controller('staff')
 export class StaffController implements OnModuleInit {
@@ -37,12 +38,15 @@ export class StaffController implements OnModuleInit {
   }
 
   @ApiBearerAuth()
-  @UseGuards(AuthGuard)
+  @UseGuards(StaffAuthGuard)
   @StaffPermissionDecorator({ resource: 'staff', action: 'create' })
   @Post()
-  create(@Body() staffCreateDto: StaffCreateDto): Observable<StaffResponse> {
+  create(
+    @Body() staffCreateDto: StaffCreateDto,
+    @LoggedinStaff() staff: Staff,
+  ): Observable<StaffResponse> {
     return this.staffService
-      .create({ ...staffCreateDto, created_by_id: 1 }) // TODO: update created by id
+      .create({ ...staffCreateDto, created_by_id: staff.user_id })
       .pipe(
         catchError((error) => {
           throw handleError(error);
@@ -51,7 +55,7 @@ export class StaffController implements OnModuleInit {
   }
 
   @ApiBearerAuth()
-  @UseGuards(AuthGuard)
+  @UseGuards(StaffAuthGuard)
   @StaffPermissionDecorator({ resource: 'staff', action: 'show' })
   @Get(':id')
   getOne(@Param('id') id: number): Observable<StaffResponse> {
@@ -63,7 +67,7 @@ export class StaffController implements OnModuleInit {
   }
 
   @ApiBearerAuth()
-  @UseGuards(AuthGuard)
+  @UseGuards(StaffAuthGuard)
   @StaffPermissionDecorator({ resource: 'staff', action: 'list' })
   @Get()
   getList(@Query() staffListDto: StaffListDto): Observable<StaffListResponse> {
@@ -75,15 +79,16 @@ export class StaffController implements OnModuleInit {
   }
 
   @ApiBearerAuth()
-  @UseGuards(AuthGuard)
+  @UseGuards(StaffAuthGuard)
   @StaffPermissionDecorator({ resource: 'staff', action: 'edit' })
   @Put(':id')
   update(
     @Param('id') id: number,
     @Body() updateStaffDto: StaffUpdateDto,
+    @LoggedinStaff() staff: Staff,
   ): Observable<StaffResponse> {
     return this.staffService
-      .update({ ...updateStaffDto, updated_by_id: 1, id: +id })
+      .update({ ...updateStaffDto, updated_by_id: staff.user_id, id: +id })
       .pipe(
         catchError((error) => {
           throw handleError(error);
@@ -92,15 +97,19 @@ export class StaffController implements OnModuleInit {
   }
 
   @ApiBearerAuth()
-  @UseGuards(AuthGuard)
+  @UseGuards(StaffAuthGuard)
   @StaffPermissionDecorator({ resource: 'staff', action: 'delete' })
   @Delete(':id')
-  delete(@Param('id') id: number): Observable<StaffResponse> {
-    return this.staffService.delete({ id: +id, deleted_by_id: 1 }).pipe(
-      // TODO: update deleted by id
-      catchError((error) => {
-        throw handleError(error);
-      }),
-    );
+  delete(
+    @Param('id') id: number,
+    @LoggedinStaff() staff: Staff,
+  ): Observable<StaffResponse> {
+    return this.staffService
+      .delete({ id: +id, deleted_by_id: staff.user_id })
+      .pipe(
+        catchError((error) => {
+          throw handleError(error);
+        }),
+      );
   }
 }

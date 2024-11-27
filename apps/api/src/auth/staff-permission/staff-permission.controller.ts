@@ -6,10 +6,12 @@ import {
   OnModuleInit,
   Param,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import { ClientGrpc } from '@nestjs/microservices';
 import {
   AUTH_PACKAGE_NAME,
+  Staff,
   STAFF_PERMISSION_SERVICE_NAME,
   StaffPermissionListResponse,
   StaffPermissionServiceClient,
@@ -17,6 +19,9 @@ import {
 import { StaffPermissionAssignDto } from './dto';
 import { catchError, Observable } from 'rxjs';
 import { handleError } from 'utils';
+import { ApiBearerAuth } from '@nestjs/swagger';
+import { StaffAuthGuard } from '../../guard';
+import { LoggedinStaff, StaffPermissionDecorator } from '../../decorator';
 
 @Controller('staff-permission')
 export class StaffPermissionController implements OnModuleInit {
@@ -30,12 +35,16 @@ export class StaffPermissionController implements OnModuleInit {
       );
   }
 
+  @ApiBearerAuth()
+  @UseGuards(StaffAuthGuard)
+  @StaffPermissionDecorator({ resource: 'staff', action: 'edit' })
   @Post()
   create(
     @Body() staffPermissionAssignDto: StaffPermissionAssignDto,
+    @LoggedinStaff() staff: Staff,
   ): Observable<StaffPermissionListResponse> {
     return this.staffPermissionService
-      .assign({ ...staffPermissionAssignDto, created_by_id: 1 }) // TODO: update created by id
+      .assign({ ...staffPermissionAssignDto, created_by_id: staff.user_id })
       .pipe(
         catchError((error) => {
           throw handleError(error);

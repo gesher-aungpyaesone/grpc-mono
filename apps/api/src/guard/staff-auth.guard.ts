@@ -10,7 +10,7 @@ import { StaffAuthService } from '../auth/staff-auth/staff-auth.service';
 import { Reflector } from '@nestjs/core';
 import { STAFF_PERMISSION_DECORATOR } from '../decorator';
 
-export class AuthGuard implements CanActivate {
+export class StaffAuthGuard implements CanActivate {
   constructor(
     private readonly reflector: Reflector,
     @Inject() private readonly authService: StaffAuthService,
@@ -32,6 +32,8 @@ export class AuthGuard implements CanActivate {
     if (!verifiedStaff || (verifiedStaff && !verifiedStaff.data)) {
       throw new UnauthorizedException();
     }
+
+    request.staff = verifiedStaff.data;
 
     if (verifiedStaff.data.is_root) {
       return true;
