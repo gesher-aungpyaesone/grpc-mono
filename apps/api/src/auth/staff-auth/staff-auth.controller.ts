@@ -64,7 +64,7 @@ export class StaffAuthController implements OnModuleInit {
       access_token: this.jwtService.sign({
         sub: data.id,
         email: data.email,
-        expiresIn: remember_me ? '3d' : '4h',
+        expiresIn: remember_me ? '7d' : '1d',
       }),
       is_root: data.is_root,
       permissions: permissions.data,

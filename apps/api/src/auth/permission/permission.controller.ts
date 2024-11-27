@@ -5,6 +5,7 @@ import {
   OnModuleInit,
   Param,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { ClientGrpc } from '@nestjs/microservices';
 import {
@@ -17,6 +18,8 @@ import {
 import { catchError, Observable } from 'rxjs';
 import { PermissionListDto } from './dto';
 import { handleError } from 'utils';
+import { ApiBearerAuth } from '@nestjs/swagger';
+import { AuthGuard } from '../../guard';
 
 @Controller('permission')
 export class PermissionController implements OnModuleInit {
@@ -29,6 +32,8 @@ export class PermissionController implements OnModuleInit {
     );
   }
 
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
   @Get(':id')
   getOne(@Param('id') id: number): Observable<PermissionResponse> {
     return this.permissionService.getOne({ id: +id }).pipe(
@@ -38,6 +43,8 @@ export class PermissionController implements OnModuleInit {
     );
   }
 
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
   @Get()
   getList(
     @Query() staffPositionListDto: PermissionListDto,

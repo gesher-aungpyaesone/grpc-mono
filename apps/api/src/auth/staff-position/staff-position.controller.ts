@@ -9,6 +9,7 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { ClientGrpc } from '@nestjs/microservices';
 import {
@@ -25,6 +26,9 @@ import {
 } from './dto';
 import { catchError, Observable } from 'rxjs';
 import { handleError } from 'utils';
+import { ApiBearerAuth } from '@nestjs/swagger';
+import { AuthGuard } from '../../guard';
+import { StaffPermissionDecorator } from '../../decorator';
 
 @Controller('staff-position')
 export class StaffPositionController implements OnModuleInit {
@@ -38,6 +42,9 @@ export class StaffPositionController implements OnModuleInit {
       );
   }
 
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
+  @StaffPermissionDecorator({ resource: 'staff-position', action: 'create' })
   @Post()
   create(
     @Body() staffCreateDto: StaffPositionCreateDto,
@@ -51,6 +58,8 @@ export class StaffPositionController implements OnModuleInit {
       );
   }
 
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
   @Get(':id')
   getOne(@Param('id') id: number): Observable<StaffPositionResponse> {
     return this.staffPositionService.getOne({ id: +id }).pipe(
@@ -60,6 +69,8 @@ export class StaffPositionController implements OnModuleInit {
     );
   }
 
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
   @Get()
   getList(
     @Query() staffPositionListDto: StaffPositionListDto,
@@ -71,6 +82,9 @@ export class StaffPositionController implements OnModuleInit {
     );
   }
 
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
+  @StaffPermissionDecorator({ resource: 'staff-position', action: 'edit' })
   @Put(':id')
   update(
     @Param('id') id: number,
@@ -85,6 +99,9 @@ export class StaffPositionController implements OnModuleInit {
       );
   }
 
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
+  @StaffPermissionDecorator({ resource: 'staff-position', action: 'delete' })
   @Delete(':id')
   delete(@Param('id') id: number): Observable<StaffPositionResponse> {
     return this.staffPositionService.delete({ id: +id, deleted_by_id: 1 }).pipe(

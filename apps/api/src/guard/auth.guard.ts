@@ -7,9 +7,14 @@ import {
 } from '@nestjs/common';
 import { Request } from 'express';
 import { StaffAuthService } from '../auth/staff-auth/staff-auth.service';
+import { Reflector } from '@nestjs/core';
+import { STAFF_PERMISSION_DECORATOR } from '../decorator';
 
 export class AuthGuard implements CanActivate {
-  constructor(@Inject() private readonly authService: StaffAuthService) {}
+  constructor(
+    private readonly reflector: Reflector,
+    @Inject() private readonly authService: StaffAuthService,
+  ) {}
   private extractTokenFromHeader(request: Request): string | undefined {
     const [type, token] = request.headers.authorization?.split(' ') ?? [];
     return type === 'Bearer' ? token : undefined;
@@ -28,11 +33,22 @@ export class AuthGuard implements CanActivate {
       throw new UnauthorizedException();
     }
 
-    const haveAccess = await this.authService.verifyAccess(
-      verifiedStaff.data.id,
-    );
-    if (!haveAccess) {
-      throw new ForbiddenException();
+    if (verifiedStaff.data.is_root) {
+      return true;
+    }
+
+    const allowedPermission = this.reflector.get<{
+      resource: string;
+      action: string;
+    }>(STAFF_PERMISSION_DECORATOR, context.getHandler());
+    if (allowedPermission) {
+      const haveAccess = await this.authService.verifyAccess(
+        verifiedStaff.data.id,
+        allowedPermission,
+      );
+      if (!haveAccess) {
+        throw new ForbiddenException();
+      }
     }
     return true;
   }

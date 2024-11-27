@@ -30,20 +30,29 @@ export class StaffAuthService implements OnModuleInit {
   }
 
   async verifyToken(token: string) {
-    const decodedToken = this.jwtService.verify(token);
-    const staff = await firstValueFrom(
-      this.staffService.getOne({ id: decodedToken.sub }).pipe(
-        catchError((error) => {
-          throw handleError(error);
-        }),
-      ),
-    );
-    return staff;
+    try {
+      const decodedToken = this.jwtService.verify(token);
+      const staff = await firstValueFrom(
+        this.staffService.getOne({ id: decodedToken.sub }).pipe(
+          catchError((error) => {
+            throw handleError(error);
+          }),
+        ),
+      );
+      return staff;
+    } catch (error) {
+      return null;
+    }
   }
 
-  async verifyAccess(staff_id: number) {
-    //TODO: add permission check ...
-    const { total_count } = await firstValueFrom(
+  async verifyAccess(
+    staff_id: number,
+    permission: {
+      resource: string;
+      action: string;
+    },
+  ) {
+    const { total_count, data } = await firstValueFrom(
       this.staffPermissionService.getListByStaff({ staff_id }).pipe(
         catchError((error) => {
           throw handleError(error);
@@ -51,6 +60,15 @@ export class StaffAuthService implements OnModuleInit {
       ),
     );
 
-    return !!total_count;
+    if (!total_count) {
+      return false;
+    }
+
+    const allow = data.some(
+      (perm) =>
+        perm.permission.resource.name == permission.resource &&
+        perm.permission.type.name == permission.action,
+    );
+    return !!allow;
   }
 }

@@ -8,7 +8,7 @@ import { StaffAuthService } from './staff-auth.service';
   imports: [
     JwtModule.register({
       secret: process.env.STAFF_JWT_SECRET,
-      signOptions: { expiresIn: '1h' },
+      signOptions: { expiresIn: '1d' },
     }),
   ],
   controllers: [StaffAuthController],
