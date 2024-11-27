@@ -15,6 +15,7 @@ message AuthHealthCheckResponse {
   bool status = 1;
 }
 
+// user
 enum SystemUserType {
   CUSTOMER = 0;
   STAFF = 1;
@@ -84,6 +85,7 @@ message StaffPermission {
   optional google.protobuf.Timestamp created_at = 4;
 }
 
+// staff
 message Staff {
   int32 id = 1;
   int32 user_id = 2;
@@ -163,6 +165,7 @@ service StaffService {
   rpc getList (StaffListRequest) returns (StaffListResponse);
 }
 
+// staff position
 message StaffPosition {
   int32 id = 1;
   string name = 2;
@@ -220,6 +223,7 @@ service StaffPositionService {
   rpc getList (StaffPositionListRequest) returns (StaffPositionListResponse);
 }
 
+// staff auth
 message StaffLoginRequest {
   string email = 1;
   string password = 2;
@@ -257,6 +261,7 @@ service StaffAuthService {
   rpc getMe (StaffGetMeRequest) returns (StaffGetMeResponse);
 }
 
+// permission
 message PermissionResponse {
   Permission data = 1;
 }
@@ -281,6 +286,7 @@ service PermissionService {
   rpc getList (PermissionListRequest) returns (PermissionListResponse);
 }
 
+// staff permission
 message StaffPermissionAssignRequest {
   int32 staff_id = 1;
   repeated int32 permission_ids = 2;
@@ -299,4 +305,62 @@ message StaffPermissionListResponse {
 service StaffPermissionService {
   rpc assign (StaffPermissionAssignRequest) returns (StaffPermissionListResponse);
   rpc getListByStaff (StaffPermissionListByStaffRequest) returns (StaffPermissionListResponse);
+}
+
+// group
+message Group {
+  int32 id = 1;
+  string name = 2;
+  optional string description = 3;
+  optional google.protobuf.Timestamp created_at = 4;
+  optional google.protobuf.Timestamp updated_at = 5;
+  optional google.protobuf.Timestamp deleted_at = 6;
+  optional int32 created_by_id = 7;
+  optional int32 updated_by_id = 8;
+  optional int32 deleted_by_id = 9;
+}
+
+message GroupCreateRequest {
+  string name = 1;
+  optional string description = 2;
+  int32 created_by_id = 3;
+}
+
+message GroupResponse {
+  Group data = 1;
+}
+
+message GroupUpdateRequest {
+  string name = 1;
+  optional string description = 2;
+  int32 updated_by_id = 3;
+  int32 id = 4;
+}
+
+message GroupDeleteRequest {
+  int32 id = 1;
+  optional int32 deleted_by_id = 2;
+}
+
+message GroupListRequest {
+  optional string sort = 1; // ["field_name", "ASC/DESC"]
+  optional string range = 2;  // [start, end]
+  optional string filter = 3; // {"field": "value", "field2": "value2"}
+}
+
+message GroupGetOneRequest {
+  int32 id = 1;
+}
+
+message GroupListResponse {
+  repeated Group data = 1;
+  int32 total_count = 2;
+}
+
+service GroupService {
+  rpc create (GroupCreateRequest) returns (GroupResponse);
+  rpc update (GroupUpdateRequest) returns (GroupResponse);
+  rpc delete (GroupDeleteRequest) returns (GroupResponse);
+  rpc getOne (GroupGetOneRequest) returns (GroupResponse);
+  rpc getList (GroupListRequest) returns (GroupListResponse);
 }

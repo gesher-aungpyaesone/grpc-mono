@@ -9,6 +9,7 @@ import { StaffAuthModule } from './staff-auth/staff-auth.module';
 import { UserModule } from './user/user.module';
 import { PermissionModule } from './permission/permission.module';
 import { StaffPermissionModule } from './staff-permission/staff-permission.module';
+import { GroupModule } from './group/group.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { StaffPermissionModule } from './staff-permission/staff-permission.modul
     UserModule,
     PermissionModule,
     StaffPermissionModule,
+    GroupModule,
   ],
   controllers: [AuthController],
   providers: [AuthService],

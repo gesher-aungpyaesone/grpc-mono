@@ -64,6 +64,7 @@ model Staff {
     deleted_by_id     Int?
     tokens            StaffToken[]
     staff_permissions StaffPermission[]
+    staff_groups      StaffGroup[]
 
     @@map("staffs")
 }
@@ -116,6 +117,7 @@ model Permission {
     updated_at        DateTime           @updatedAt
     deleted_at        DateTime?
     staff_permissions StaffPermission[]
+    group_permissions GroupPermission[]
 
     @@map("permissions")
 }
@@ -130,4 +132,44 @@ model StaffPermission {
     created_by_id Int
 
     @@map("staff_permissions")
+}
+
+model Group {
+    id                Int               @id @default(autoincrement())
+    name              String            @db.VarChar(255)
+    description       String?           @db.Text
+    created_at        DateTime          @default(now())
+    updated_at        DateTime          @updatedAt
+    deleted_at        DateTime?
+    created_by_id     Int
+    updated_by_id     Int
+    deleted_by_id     Int?
+    group_permissions GroupPermission[]
+    staff_groups      StaffGroup[]
+
+    @@map("groups")
+}
+
+model GroupPermission {
+    id            Int        @id @default(autoincrement())
+    group         Group      @relation(fields: [group_id], references: [id])
+    group_id      Int
+    permission    Permission @relation(fields: [permission_id], references: [id])
+    permission_id Int
+    created_at    DateTime   @default(now())
+    created_by_id Int
+
+    @@map("group_permissions")
+}
+
+model StaffGroup {
+    id            Int      @id @default(autoincrement())
+    group         Group    @relation(fields: [group_id], references: [id])
+    group_id      Int
+    staff         Staff    @relation(fields: [staff_id], references: [id])
+    staff_id      Int
+    created_at    DateTime @default(now())
+    created_by_id Int
+
+    @@map("staff_groups")
 }

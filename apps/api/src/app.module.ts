@@ -4,6 +4,7 @@ import { AppService } from './app.service';
 import { AuthClientModule } from '@app/auth-client';
 import { ConfigModule } from '@nestjs/config';
 import {
+  GroupModule,
   PermissionModule,
   StaffAuthModule,
   StaffModule,
@@ -24,6 +25,7 @@ import {
     StaffPositionModule,
     StaffModule,
     StaffPermissionModule,
+    GroupModule,
   ],
   controllers: [AppController],
   providers: [AppService],
