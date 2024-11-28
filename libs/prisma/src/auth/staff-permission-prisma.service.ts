@@ -1,13 +1,16 @@
 import { Inject } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
 import * as grpc from '@grpc/grpc-js';
+import { Prisma } from '@prisma/auth-ms';
 import {
   StaffPermissionAssignRequest,
   StaffPermissionListByStaffRequest,
+  StaffPermissionListRequest,
 } from 'protos/dist/auth';
 import { PermissionService } from './permission-prisma.service';
 import { StaffService } from './staff-prisma.service';
 import { AuthPrismaService } from './auth-prisma.service';
+import { validateFilter, validateRange, validateSort } from 'utils';
 
 export class StaffPermissionService {
   constructor(
@@ -43,6 +46,61 @@ export class StaffPermissionService {
         message: 'staff not found',
       });
     return staff.staff_permissions;
+  }
+
+  async getListStaffPermission(
+    staffPermissionListRequest: StaffPermissionListRequest,
+  ) {
+    const { sort, range, filter } = staffPermissionListRequest;
+    const fields = Object.keys(Prisma.StaffPermissionScalarFieldEnum);
+    const parsedSort = validateSort(sort, fields);
+    const parsedRange = validateRange(range);
+    const parsedFilter = validateFilter(filter, fields);
+    const queryOptions: Prisma.StaffPermissionFindManyArgs = {
+      include: {
+        permission: true,
+      },
+    };
+    if (parsedSort) {
+      const [field, order] = parsedSort;
+      queryOptions.orderBy = { [field]: order };
+    }
+
+    if (parsedRange) {
+      queryOptions.skip = parsedRange[0];
+      queryOptions.take = parsedRange[1] - parsedRange[0];
+    }
+    if (parsedFilter && Object.keys(parsedFilter).length > 0) {
+      const filterConditions: Record<string, any> = {};
+      for (const key in parsedFilter) {
+        if (key in parsedFilter) {
+          const filterValue = parsedFilter[key];
+          if (key === 'id' && Array.isArray(filterValue)) {
+            filterConditions[key] = { in: filterValue };
+          } else if (typeof filterValue === 'string') {
+            filterConditions[key] = {
+              contains: filterValue,
+              mode: 'insensitive',
+            };
+          } else {
+            filterConditions[key] = filterValue;
+          }
+        }
+      }
+
+      queryOptions.where = {
+        ...queryOptions.where,
+        ...filterConditions,
+      };
+    }
+
+    const staffPermissions =
+      await this.prisma.staffPermission.findMany(queryOptions);
+    const totalCount = await this.prisma.staffPermission.count({
+      where: queryOptions.where,
+    });
+
+    return { staffPermissions, totalCount };
   }
 
   async assignStaffPermission(

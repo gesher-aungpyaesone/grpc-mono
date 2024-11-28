@@ -11,16 +11,28 @@ import {
   GroupUpdateRequest,
 } from 'protos/dist/auth';
 import { AuthPrismaService } from './auth-prisma.service';
+import { PermissionService } from './permission-prisma.service';
+import { StaffService } from './staff-prisma.service';
 export class GroupService {
   constructor(
     @Inject()
     private prisma: AuthPrismaService,
+    @Inject()
+    private readonly staffService: StaffService,
+    @Inject()
+    private readonly permissionService: PermissionService,
   ) {}
 
   async validateGroupExistence(group_id: number): Promise<Group> {
     const group = await this.prisma.group.findUnique({
       where: { id: group_id },
+      include: {
+        staff_groups: true,
+        group_permissions: true,
+      },
     });
+
+    console.log(group);
 
     if (!group) {
       throw new RpcException({
@@ -33,13 +45,37 @@ export class GroupService {
   }
 
   async createGroup(groupCreateRequest: GroupCreateRequest) {
-    const { name, description, created_by_id } = groupCreateRequest;
+    const { name, description, created_by_id, staff_ids, permission_ids } =
+      groupCreateRequest;
+
+    const staffs = staff_ids
+      ? await this.staffService.validateStaffsExistence(staff_ids)
+      : [];
+    const permissions = permission_ids
+      ? await this.permissionService.validatePermissionsExistence(
+          permission_ids,
+        )
+      : [];
+
+    // TODO
     const createdGroup = await this.prisma.group.create({
       data: {
         name,
         description,
         created_by_id,
         updated_by_id: created_by_id,
+        staff_groups: {
+          create: staffs.map((staff) => ({
+            staff_id: staff.id,
+            created_by_id,
+          })),
+        },
+        group_permissions: {
+          create: permissions.map((permission) => ({
+            permission_id: permission.id,
+            created_by_id,
+          })),
+        },
       },
     });
 

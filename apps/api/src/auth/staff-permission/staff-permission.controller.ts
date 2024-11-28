@@ -6,6 +6,7 @@ import {
   OnModuleInit,
   Param,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { ClientGrpc } from '@nestjs/microservices';
@@ -16,7 +17,7 @@ import {
   StaffPermissionListResponse,
   StaffPermissionServiceClient,
 } from 'protos/dist/auth';
-import { StaffPermissionAssignDto } from './dto';
+import { StaffPermissionAssignDto, StaffPermissionListDto } from './dto';
 import { catchError, Observable } from 'rxjs';
 import { handleError } from 'utils';
 import { ApiBearerAuth } from '@nestjs/swagger';
@@ -58,6 +59,22 @@ export class StaffPermissionController implements OnModuleInit {
   ): Observable<StaffPermissionListResponse> {
     return this.staffPermissionService
       .getListByStaff({ staff_id: +staff_id })
+      .pipe(
+        catchError((error) => {
+          throw handleError(error);
+        }),
+      );
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(StaffAuthGuard)
+  @StaffPermissionDecorator({ resource: 'staff', action: 'edit' })
+  @Get()
+  getList(
+    @Query() staffPermissionListDto: StaffPermissionListDto,
+  ): Observable<StaffPermissionListResponse> {
+    return this.staffPermissionService
+      .getList({ ...staffPermissionListDto })
       .pipe(
         catchError((error) => {
           throw handleError(error);

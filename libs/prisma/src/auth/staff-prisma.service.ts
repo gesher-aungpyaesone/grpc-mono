@@ -66,6 +66,21 @@ export class StaffService {
 
     return existingStaff;
   }
+  async validateStaffsExistence(staff_ids: number[]): Promise<Staff[]> {
+    const staffs = await this.prisma.staff.findMany({
+      where: {
+        id: { in: staff_ids },
+      },
+    });
+    if (staffs.length !== staff_ids.length) {
+      throw new RpcException({
+        code: grpc.status.NOT_FOUND,
+        message: 'One or more staffs not found',
+      });
+    }
+
+    return staffs;
+  }
 
   async createStaff(staffCreateRequest: StaffCreateRequest) {
     const { email, password, position_id } = staffCreateRequest;

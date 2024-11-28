@@ -56,13 +56,13 @@ export class GroupController {
   ): Promise<GroupListResponse> {
     const { groups, totalCount } =
       await this.prisma.getListGroup(groupListRequest);
-    const transformedGroups = groups.map((staff) => {
+    const transformedGroups = groups.map((group) => {
       const timestamps = transformTimestamps(
-        staff.created_at,
-        staff.updated_at,
-        staff.deleted_at,
+        group.created_at,
+        group.updated_at,
+        group.deleted_at,
       );
-      return { ...staff, ...timestamps };
+      return { ...group, ...timestamps };
     });
     return {
       data: transformedGroups,

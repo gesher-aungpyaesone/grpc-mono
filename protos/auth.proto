@@ -302,12 +302,26 @@ message StaffPermissionListResponse {
   int32 total_count = 2;
 }
 
+message StaffPermissionListRequest {
+  optional string sort = 1; // ["field_name", "ASC/DESC"]
+  optional string range = 2;  // [start, end]
+  optional string filter = 3; // {"field": "value", "field2": "value2"}
+}
+
 service StaffPermissionService {
   rpc assign (StaffPermissionAssignRequest) returns (StaffPermissionListResponse);
   rpc getListByStaff (StaffPermissionListByStaffRequest) returns (StaffPermissionListResponse);
+  rpc getList (StaffPermissionListRequest) returns (StaffPermissionListResponse);
 }
 
 // group
+message GroupPermission {
+  int32 id = 1;
+  optional Permission permission = 2;
+  int32 created_by_id = 3;
+  optional google.protobuf.Timestamp created_at = 4;
+}
+
 message Group {
   int32 id = 1;
   string name = 2;
@@ -323,7 +337,9 @@ message Group {
 message GroupCreateRequest {
   string name = 1;
   optional string description = 2;
-  int32 created_by_id = 3;
+  repeated int32 permission_ids = 3;
+  repeated int32 staff_ids = 4;
+  int32 created_by_id = 5;
 }
 
 message GroupResponse {
