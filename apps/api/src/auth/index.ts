@@ -5,3 +5,5 @@ export * from './staff-auth/staff-auth.module';
 export * from './permission/permission.module';
 export * from './staff-permission/staff-permission.module';
 export * from './group/group.module';
+export * from './group-permission/group-permission.module';
+export * from './staff-group/staff-group.module';

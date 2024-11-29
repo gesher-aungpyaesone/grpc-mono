@@ -5,8 +5,10 @@ import { AuthClientModule } from '@app/auth-client';
 import { ConfigModule } from '@nestjs/config';
 import {
   GroupModule,
+  GroupPermissionModule,
   PermissionModule,
   StaffAuthModule,
+  StaffGroupModule,
   StaffModule,
   StaffPermissionModule,
   StaffPositionModule,
@@ -26,6 +28,8 @@ import {
     StaffModule,
     StaffPermissionModule,
     GroupModule,
+    GroupPermissionModule,
+    StaffGroupModule,
   ],
   controllers: [AppController],
   providers: [AppService],

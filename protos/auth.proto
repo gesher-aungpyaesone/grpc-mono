@@ -315,13 +315,6 @@ service StaffPermissionService {
 }
 
 // group
-message GroupPermission {
-  int32 id = 1;
-  optional Permission permission = 2;
-  int32 created_by_id = 3;
-  optional google.protobuf.Timestamp created_at = 4;
-}
-
 message Group {
   int32 id = 1;
   string name = 2;
@@ -379,4 +372,63 @@ service GroupService {
   rpc delete (GroupDeleteRequest) returns (GroupResponse);
   rpc getOne (GroupGetOneRequest) returns (GroupResponse);
   rpc getList (GroupListRequest) returns (GroupListResponse);
+}
+
+// group permission
+message GroupPermission {
+  int32 id = 1;
+  optional Permission permission = 2;
+  int32 created_by_id = 3;
+  optional google.protobuf.Timestamp created_at = 4;
+}
+
+message GroupPermissionAssignRequest {
+  int32 group_id = 1;
+  repeated int32 permission_ids = 2;
+  int32 created_by_id = 3;
+}
+
+message GroupPermissionListByGroupRequest {
+  int32 group_id = 1;
+}
+
+message GroupPermissionListResponse {
+  repeated GroupPermission data = 1;
+  int32 total_count = 2;
+}
+
+message GroupPermissionListRequest {
+  optional string sort = 1; // ["field_name", "ASC/DESC"]
+  optional string range = 2;  // [start, end]
+  optional string filter = 3; // {"field": "value", "field2": "value2"}
+}
+
+service GroupPermissionService {
+  rpc assign (GroupPermissionAssignRequest) returns (GroupPermissionListResponse);
+  rpc getListByGroup (GroupPermissionListByGroupRequest) returns (GroupPermissionListResponse);
+  rpc getList (GroupPermissionListRequest) returns (GroupPermissionListResponse);
+}
+
+// staff group
+message StaffGroup {
+  int32 id = 1;
+  optional Group group = 2;
+  optional Staff staff = 3;
+  int32 created_by_id = 4;
+  optional google.protobuf.Timestamp created_at = 5;
+}
+
+message StaffGroupListResponse {
+  repeated StaffGroup data = 1;
+  int32 total_count = 2;
+}
+
+message StaffGroupListRequest {
+  optional string sort = 1; // ["field_name", "ASC/DESC"]
+  optional string range = 2;  // [start, end]
+  optional string filter = 3; // {"field": "value", "field2": "value2"}
+}
+
+service StaffGroupService {
+  rpc getList (StaffGroupListRequest) returns (StaffGroupListResponse);
 }
