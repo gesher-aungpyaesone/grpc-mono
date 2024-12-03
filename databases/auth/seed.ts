@@ -123,7 +123,7 @@ async function main() {
     });
   }
 
-  const permissionTypes = ['create', 'read', 'edit', 'delete', 'export'];
+  const permissionTypes = ['create', 'read', 'edit', 'delete', 'assign'];
   for (const type of permissionTypes) {
     await prisma.permissionType.create({
       data: { name: type },
@@ -135,13 +135,37 @@ async function main() {
     data: { name: 'staff' },
   });
 
+  const permissionStaffPermissionResource = await prisma.permissionResource.create({
+    data: { name: 'staff-permission' },
+  });
+
   // Create permissions for staff
   const staffPermissions = [
-    { name: 'Create Staff', permissionType: 'create', resource: permissionStaffResource },
-    { name: 'Read Staff', permissionType: 'read', resource: permissionStaffResource },
-    { name: 'Edit Staff', permissionType: 'edit', resource: permissionStaffResource },
-    { name: 'Delete Staff', permissionType: 'delete', resource: permissionStaffResource },
-    { name: 'Export Staff', permissionType: 'export', resource: permissionStaffResource },
+    {
+      name: '[Staff] Create Staff',
+      permissionType: 'create',
+      resource: permissionStaffResource,
+    },
+    {
+      name: '[Staff] Read Staff',
+      permissionType: 'read',
+      resource: permissionStaffResource,
+    },
+    {
+      name: '[Staff] Edit Staff',
+      permissionType: 'edit',
+      resource: permissionStaffResource,
+    },
+    {
+      name: '[Staff] Delete Staff',
+      permissionType: 'delete',
+      resource: permissionStaffResource,
+    },
+    {
+      name: '[Staff] Assign Staff Permission',
+      permissionType: 'assign',
+      resource: permissionStaffPermissionResource,
+    },
   ];
 
   for (const perm of staffPermissions) {
@@ -165,11 +189,26 @@ async function main() {
 
   // Create permissions for staff position
   const staffPositionPermissions = [
-    { name: 'Create Staff Position', permissionType: 'create', resource: permissionPositionResource },
-    { name: 'Read Staff Position', permissionType: 'read', resource: permissionPositionResource },
-    { name: 'Edit Staff Position', permissionType: 'edit', resource: permissionPositionResource },
-    { name: 'Delete Staff Position', permissionType: 'delete', resource: permissionPositionResource },
-    { name: 'Export Staff Position', permissionType: 'export', resource: permissionPositionResource },
+    {
+      name: '[Position] Create Staff Position',
+      permissionType: 'create',
+      resource: permissionPositionResource,
+    },
+    {
+      name: '[Position] Read Staff Position',
+      permissionType: 'read',
+      resource: permissionPositionResource,
+    },
+    {
+      name: '[Position] Edit Staff Position',
+      permissionType: 'edit',
+      resource: permissionPositionResource,
+    },
+    {
+      name: '[Position] Delete Staff Position',
+      permissionType: 'delete',
+      resource: permissionPositionResource,
+    },
   ];
 
   for (const perm of staffPositionPermissions) {
