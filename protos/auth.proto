@@ -83,6 +83,8 @@ message StaffPermission {
   optional Permission permission = 2;
   int32 created_by_id = 3;
   optional google.protobuf.Timestamp created_at = 4;
+  repeated int32 allow_ids = 5;
+  bool is_allowed_all = 6;
 }
 
 // staff
@@ -289,8 +291,14 @@ service PermissionService {
 // staff permission
 message StaffPermissionAssignRequest {
   int32 staff_id = 1;
-  repeated int32 permission_ids = 2;
-  int32 created_by_id = 3;
+  int32 permission_id = 2;
+  bool is_allowed_all = 3;
+  repeated int32 allow_ids = 4;
+  int32 created_by_id = 5;
+}
+
+message StaffPermissionResponse {
+  StaffPermission data = 1;
 }
 
 message StaffPermissionListByStaffRequest {
@@ -309,7 +317,7 @@ message StaffPermissionListRequest {
 }
 
 service StaffPermissionService {
-  rpc assign (StaffPermissionAssignRequest) returns (StaffPermissionListResponse);
+  rpc assign (StaffPermissionAssignRequest) returns (StaffPermissionResponse);
   rpc getListByStaff (StaffPermissionListByStaffRequest) returns (StaffPermissionListResponse);
   rpc getList (StaffPermissionListRequest) returns (StaffPermissionListResponse);
 }

@@ -11,13 +11,19 @@ import { PermissionService } from './permission-prisma.service';
 import { StaffService } from './staff-prisma.service';
 import { AuthPrismaService } from './auth-prisma.service';
 import { validateFilter, validateRange, validateSort } from 'utils';
+import { StaffPositionService } from './staff-position-prisma.service';
+import { UserService } from './user-prisma.service';
 
 export class StaffPermissionService {
   constructor(
     @Inject()
     private prisma: AuthPrismaService,
     @Inject()
+    private readonly userService: UserService,
+    @Inject()
     private readonly staffService: StaffService,
+    @Inject()
+    private readonly staffPositionService: StaffPositionService,
     @Inject()
     private readonly permissionService: PermissionService,
   ) {}
@@ -106,39 +112,54 @@ export class StaffPermissionService {
   async assignStaffPermission(
     staffPermissionAssignRequest: StaffPermissionAssignRequest,
   ) {
-    const { staff_id, permission_ids, created_by_id } =
-      staffPermissionAssignRequest;
+    const {
+      staff_id,
+      permission_id,
+      is_allowed_all,
+      allow_ids,
+      created_by_id,
+    } = staffPermissionAssignRequest;
+
     await this.staffService.validateStaffExistence(staff_id);
-    await this.permissionService.validatePermissionsExistence(permission_ids);
-
-    const existingAssignments = await this.prisma.staffPermission.findMany({
-      where: {
-        staff_id,
-        permission_id: { in: permission_ids },
-      },
-      select: { permission_id: true },
-    });
-
-    const alreadyAssignedPermissionIds = existingAssignments.map(
-      (assignment) => assignment.permission_id,
-    );
-
-    const permissionsToAssign = permission_ids.filter(
-      (permission_id) => !alreadyAssignedPermissionIds.includes(permission_id),
-    );
-
-    if (permissionsToAssign.length) {
-      const staffPermissions = permissionsToAssign.map((permission_id) => ({
-        staff_id,
-        permission_id,
-        created_by_id,
-      }));
-
-      await this.prisma.staffPermission.createMany({
-        data: staffPermissions,
-      });
+    await this.userService.validateUserExistence(created_by_id);
+    const permission =
+      await this.permissionService.validatePermissionExistence(permission_id);
+    if (!is_allowed_all && allow_ids) {
+      switch (permission.resource.name) {
+        case 'staff':
+          await this.staffService.validateStaffsExistence(allow_ids);
+          break;
+        case 'staff-position':
+          await this.staffPositionService.validateStaffPositionsExistence(
+            allow_ids,
+          );
+          break;
+        default:
+          break;
+      }
     }
 
-    return await this.getListStaffPermissionByStaff({ staff_id });
+    const existingPermission = await this.prisma.staffPermission.findFirst({
+      where: { permission_id, staff_id },
+    });
+
+    if (existingPermission) {
+      const updatedStaffPermission = await this.prisma.staffPermission.update({
+        where: { id: existingPermission.id },
+        data: { is_allowed_all, allow_ids },
+      });
+      return updatedStaffPermission;
+    }
+
+    const createdStaffPermission = await this.prisma.staffPermission.create({
+      data: {
+        created_by_id,
+        staff_id,
+        permission_id,
+        is_allowed_all,
+        allow_ids,
+      },
+    });
+    return createdStaffPermission;
   }
 }

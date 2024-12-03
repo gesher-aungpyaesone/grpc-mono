@@ -79,39 +79,39 @@ export const validateFilter = (
   fields: string[],
 ): { [key: string]: any } | undefined => {
   if (filter) {
-    try {
-      const parsedFilter = JSON.parse(filter);
+    // try {
+    const parsedFilter = JSON.parse(filter);
 
-      if (typeof parsedFilter === 'object' && parsedFilter !== null) {
-        const filterKeys = Object.keys(parsedFilter);
+    if (typeof parsedFilter === 'object' && parsedFilter !== null) {
+      const filterKeys = Object.keys(parsedFilter);
 
-        for (const key of filterKeys) {
-          if (!fields.includes(key)) {
-            throw new RpcException({
-              code: grpc.status.INVALID_ARGUMENT,
-              message: JSON.stringify({
-                filter: [`invalid field '${key}' in filter`],
-              }),
-            });
-          }
+      for (const key of filterKeys) {
+        if (!fields.includes(key) && key !== 'q') {
+          throw new RpcException({
+            code: grpc.status.INVALID_ARGUMENT,
+            message: JSON.stringify({
+              filter: [`invalid field '${key}' in filter`],
+            }),
+          });
         }
-
-        return parsedFilter;
       }
-      throw new RpcException({
-        code: grpc.status.INVALID_ARGUMENT,
-        message: JSON.stringify({
-          filter: ['filter must be a valid object with field names and values'],
-        }),
-      });
-    } catch (error) {
-      throw new RpcException({
-        code: grpc.status.INVALID_ARGUMENT,
-        message: JSON.stringify({
-          filter: ['filter must be a valid JSON object'],
-        }),
-      });
+
+      return parsedFilter;
     }
+    throw new RpcException({
+      code: grpc.status.INVALID_ARGUMENT,
+      message: JSON.stringify({
+        filter: ['filter must be a valid object with field names and values'],
+      }),
+    });
+    // } catch (error) {
+    //   throw new RpcException({
+    //     code: grpc.status.INVALID_ARGUMENT,
+    //     message: JSON.stringify({
+    //       filter: ['filter must be a valid JSON object'],
+    //     }),
+    //   });
+    // }
   }
 
   // Return undefined if no filter is provided

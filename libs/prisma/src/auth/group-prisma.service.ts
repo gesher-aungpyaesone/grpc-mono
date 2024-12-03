@@ -32,8 +32,6 @@ export class GroupService {
       },
     });
 
-    console.log(group);
-
     if (!group) {
       throw new RpcException({
         code: grpc.status.NOT_FOUND,

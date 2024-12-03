@@ -1,6 +1,6 @@
 import { Inject } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
-import { Prisma, StaffPosition } from '@prisma/auth-ms';
+import { Prisma } from '@prisma/auth-ms';
 import * as grpc from '@grpc/grpc-js';
 import { validateFilter, validateRange, validateSort } from 'utils';
 import {
@@ -17,9 +17,7 @@ export class StaffPositionService {
     private prisma: AuthPrismaService,
   ) {}
 
-  async validateStaffPositionExistence(
-    position_id: number,
-  ): Promise<StaffPosition> {
+  async validateStaffPositionExistence(position_id: number) {
     const position = await this.prisma.staffPosition.findUnique({
       where: { id: position_id },
     });
@@ -32,6 +30,22 @@ export class StaffPositionService {
     }
 
     return position;
+  }
+
+  async validateStaffPositionsExistence(position_ids: number[]) {
+    const staffPositions = await this.prisma.staffPosition.findMany({
+      where: {
+        id: { in: position_ids },
+      },
+    });
+    if (staffPositions.length !== position_ids.length) {
+      throw new RpcException({
+        code: grpc.status.NOT_FOUND,
+        message: 'One or more staff positions not found',
+      });
+    }
+
+    return staffPositions;
   }
 
   async createStaffPosition(

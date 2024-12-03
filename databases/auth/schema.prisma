@@ -123,13 +123,15 @@ model Permission {
 }
 
 model StaffPermission {
-    id            Int        @id @default(autoincrement())
-    staff         Staff      @relation(fields: [staff_id], references: [id])
-    staff_id      Int
-    permission    Permission @relation(fields: [permission_id], references: [id])
-    permission_id Int
-    created_at    DateTime   @default(now())
-    created_by_id Int
+    id             Int        @id @default(autoincrement())
+    staff          Staff      @relation(fields: [staff_id], references: [id])
+    staff_id       Int
+    permission     Permission @relation(fields: [permission_id], references: [id])
+    permission_id  Int
+    is_allowed_all Boolean    @default(true)
+    allow_ids      Json?
+    created_at     DateTime   @default(now())
+    created_by_id  Int
 
     @@map("staff_permissions")
 }
@@ -151,13 +153,15 @@ model Group {
 }
 
 model GroupPermission {
-    id            Int        @id @default(autoincrement())
-    group         Group      @relation(fields: [group_id], references: [id])
-    group_id      Int
-    permission    Permission @relation(fields: [permission_id], references: [id])
-    permission_id Int
-    created_at    DateTime   @default(now())
-    created_by_id Int
+    id             Int        @id @default(autoincrement())
+    group          Group      @relation(fields: [group_id], references: [id])
+    group_id       Int
+    permission     Permission @relation(fields: [permission_id], references: [id])
+    permission_id  Int
+    is_allowed_all Boolean    @default(true)
+    allow_ids      Json?
+    created_at     DateTime   @default(now())
+    created_by_id  Int
 
     @@map("group_permissions")
 }

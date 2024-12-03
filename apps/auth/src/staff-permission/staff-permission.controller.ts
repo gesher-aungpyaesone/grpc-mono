@@ -7,6 +7,7 @@ import {
   StaffPermissionListByStaffRequest,
   StaffPermissionListRequest,
   StaffPermissionListResponse,
+  StaffPermissionResponse,
 } from 'protos/dist/auth';
 import { transformTimestamps } from 'utils';
 
@@ -16,21 +17,22 @@ export class StaffPermissionController {
 
   @GrpcMethod(STAFF_PERMISSION_SERVICE_NAME, 'assign') async assign(
     staffPermissionAssignRequest: StaffPermissionAssignRequest,
-  ): Promise<StaffPermissionListResponse> {
-    const permissions = await this.prisma.assignStaffPermission(
+  ): Promise<StaffPermissionResponse> {
+    const createdStaffPermission = await this.prisma.assignStaffPermission(
       staffPermissionAssignRequest,
     );
-    const transformedStaffs = permissions.map((permissions) => {
-      const timestamps = transformTimestamps(
-        permissions.created_at,
-        null,
-        null,
-      );
-      return { ...permissions, ...timestamps };
-    });
+
+    const timestamps = transformTimestamps(
+      createdStaffPermission.created_at,
+      null,
+      null,
+    );
+
     return {
-      data: transformedStaffs,
-      total_count: transformedStaffs.length,
+      data: {
+        ...createdStaffPermission,
+        ...timestamps,
+      },
     };
   }
 

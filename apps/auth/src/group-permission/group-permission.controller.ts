@@ -1,12 +1,18 @@
 import { GroupPermissionService } from '@app/prisma/auth';
 import { Controller } from '@nestjs/common';
 import { GrpcMethod } from '@nestjs/microservices';
-import { GROUP_PERMISSION_SERVICE_NAME, GroupPermissionAssignRequest, GroupPermissionListByGroupRequest, GroupPermissionListRequest, GroupPermissionListResponse } from 'protos/dist/auth';
+import {
+  GROUP_PERMISSION_SERVICE_NAME,
+  GroupPermissionAssignRequest,
+  GroupPermissionListByGroupRequest,
+  GroupPermissionListRequest,
+  GroupPermissionListResponse,
+} from 'protos/dist/auth';
 import { transformTimestamps } from 'utils';
 
 @Controller('group-permission')
 export class GroupPermissionController {
-    constructor(private readonly prisma: GroupPermissionService) {}
+  constructor(private readonly prisma: GroupPermissionService) {}
 
   @GrpcMethod(GROUP_PERMISSION_SERVICE_NAME, 'assign') async assign(
     groupPermissionAssignRequest: GroupPermissionAssignRequest,

@@ -34,9 +34,7 @@ export class PermissionService {
     return permissions;
   }
 
-  async validatePermissionExistence(
-    permission_id: number,
-  ): Promise<Permission> {
+  async validatePermissionExistence(permission_id: number) {
     const permission = await this.prisma.permission.findUnique({
       where: { id: permission_id },
       include: { type: true, resource: true },
@@ -77,19 +75,19 @@ export class PermissionService {
     }
     if (parsedFilter && Object.keys(parsedFilter).length > 0) {
       const filterConditions: Record<string, any> = {};
-      for (const key in parsedFilter) {
-        if (key in parsedFilter) {
-          const filterValue = parsedFilter[key];
-          if (key === 'id' && Array.isArray(filterValue)) {
-            filterConditions[key] = { in: filterValue };
-          } else if (typeof filterValue === 'string') {
-            filterConditions[key] = {
-              contains: filterValue,
-              mode: 'insensitive',
-            };
-          } else {
-            filterConditions[key] = filterValue;
-          }
+      for (let key in parsedFilter) {
+        const filterValue = parsedFilter[key];
+        if (key === 'q') {
+          key = 'name';
+        }
+        if (key === 'id' && Array.isArray(filterValue)) {
+          filterConditions[key] = { in: filterValue };
+        } else if (typeof filterValue === 'string') {
+          filterConditions[key] = {
+            contains: filterValue,
+          };
+        } else {
+          filterConditions[key] = filterValue;
         }
       }
 

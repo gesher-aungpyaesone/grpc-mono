@@ -15,6 +15,7 @@ import {
   Staff,
   STAFF_PERMISSION_SERVICE_NAME,
   StaffPermissionListResponse,
+  StaffPermissionResponse,
   StaffPermissionServiceClient,
 } from 'protos/dist/auth';
 import { StaffPermissionAssignDto, StaffPermissionListDto } from './dto';
@@ -43,7 +44,7 @@ export class StaffPermissionController implements OnModuleInit {
   create(
     @Body() staffPermissionAssignDto: StaffPermissionAssignDto,
     @LoggedinStaff() staff: Staff,
-  ): Observable<StaffPermissionListResponse> {
+  ): Observable<StaffPermissionResponse> {
     return this.staffPermissionService
       .assign({ ...staffPermissionAssignDto, created_by_id: staff.user_id })
       .pipe(

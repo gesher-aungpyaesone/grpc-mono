@@ -62,6 +62,7 @@ export class StaffPositionController implements OnModuleInit {
 
   @ApiBearerAuth()
   @UseGuards(StaffAuthGuard)
+  @StaffPermissionDecorator({ resource: 'staff', action: 'read' })
   @Get(':id')
   getOne(@Param('id') id: number): Observable<StaffPositionResponse> {
     return this.staffPositionService.getOne({ id: +id }).pipe(
@@ -73,6 +74,7 @@ export class StaffPositionController implements OnModuleInit {
 
   @ApiBearerAuth()
   @UseGuards(StaffAuthGuard)
+  @StaffPermissionDecorator({ resource: 'staff', action: 'read' })
   @Get()
   getList(
     @Query() staffPositionListDto: StaffPositionListDto,
