@@ -33,18 +33,15 @@ export class StaffGroupService {
     if (parsedFilter && Object.keys(parsedFilter).length > 0) {
       const filterConditions: Record<string, any> = {};
       for (const key in parsedFilter) {
-        if (key in parsedFilter) {
-          const filterValue = parsedFilter[key];
-          if (key === 'id' && Array.isArray(filterValue)) {
-            filterConditions[key] = { in: filterValue };
-          } else if (typeof filterValue === 'string') {
-            filterConditions[key] = {
-              contains: filterValue,
-              mode: 'insensitive',
-            };
-          } else {
-            filterConditions[key] = filterValue;
-          }
+        const filterValue = parsedFilter[key];
+        if (key === 'id' && Array.isArray(filterValue)) {
+          filterConditions[key] = { in: filterValue };
+        } else if (typeof filterValue === 'string') {
+          filterConditions[key] = {
+            contains: filterValue,
+          };
+        } else {
+          filterConditions[key] = filterValue;
         }
       }
 
