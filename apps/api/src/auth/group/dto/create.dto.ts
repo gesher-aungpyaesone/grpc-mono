@@ -15,10 +15,5 @@ export class GroupCreateDto {
   @ApiPropertyOptional({ type: [Number] })
   @IsOptional()
   @IsArray()
-  permission_ids: number[];
-
-  @ApiPropertyOptional({ type: [Number] })
-  @IsOptional()
-  @IsArray()
   staff_ids: number[];
 }

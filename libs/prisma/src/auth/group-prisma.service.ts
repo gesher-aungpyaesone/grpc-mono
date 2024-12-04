@@ -43,16 +43,10 @@ export class GroupService {
   }
 
   async createGroup(groupCreateRequest: GroupCreateRequest) {
-    const { name, description, created_by_id, staff_ids, permission_ids } =
-      groupCreateRequest;
+    const { name, description, created_by_id, staff_ids } = groupCreateRequest;
 
     const staffs = staff_ids
       ? await this.staffService.validateStaffsExistence(staff_ids)
-      : [];
-    const permissions = permission_ids
-      ? await this.permissionService.validatePermissionsExistence(
-          permission_ids,
-        )
       : [];
 
     // TODO
@@ -65,12 +59,6 @@ export class GroupService {
         staff_groups: {
           create: staffs.map((staff) => ({
             staff_id: staff.id,
-            created_by_id,
-          })),
-        },
-        group_permissions: {
-          create: permissions.map((permission) => ({
-            permission_id: permission.id,
             created_by_id,
           })),
         },

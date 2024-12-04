@@ -17,6 +17,7 @@ import {
   GroupPermissionServiceClient,
   Staff,
   GROUP_PERMISSION_SERVICE_NAME,
+  GroupPermissionResponse,
 } from 'protos/dist/auth';
 import { StaffAuthGuard } from '../../guard';
 import { LoggedinStaff, StaffPermissionDecorator } from '../../decorator';
@@ -43,7 +44,7 @@ export class GroupPermissionController implements OnModuleInit {
   create(
     @Body() groupPermissionAssignDto: GroupPermissionAssignDto,
     @LoggedinStaff() staff: Staff,
-  ): Observable<GroupPermissionListResponse> {
+  ): Observable<GroupPermissionResponse> {
     return this.groupPermissionService
       .assign({ ...groupPermissionAssignDto, created_by_id: staff.user_id })
       .pipe(

@@ -7,6 +7,7 @@ import {
   GroupPermissionListByGroupRequest,
   GroupPermissionListRequest,
   GroupPermissionListResponse,
+  GroupPermissionResponse,
 } from 'protos/dist/auth';
 import { transformTimestamps } from 'utils';
 
@@ -16,21 +17,23 @@ export class GroupPermissionController {
 
   @GrpcMethod(GROUP_PERMISSION_SERVICE_NAME, 'assign') async assign(
     groupPermissionAssignRequest: GroupPermissionAssignRequest,
-  ): Promise<GroupPermissionListResponse> {
-    const permissions = await this.prisma.assignGroupPermission(
+  ): Promise<GroupPermissionResponse> {
+    const createdGroupPermission = await this.prisma.assignGroupPermission(
       groupPermissionAssignRequest,
     );
-    const transformedGroups = permissions.map((permissions) => {
-      const timestamps = transformTimestamps(
-        permissions.created_at,
-        null,
-        null,
-      );
-      return { ...permissions, ...timestamps };
-    });
+
+    const timestamps = transformTimestamps(
+      createdGroupPermission.created_at,
+      null,
+      null,
+    );
+
     return {
-      data: transformedGroups,
-      total_count: transformedGroups.length,
+      data: {
+        ...createdGroupPermission,
+        allow_ids: createdGroupPermission.allow_ids as number[],
+        ...timestamps,
+      },
     };
   }
 
@@ -41,13 +44,13 @@ export class GroupPermissionController {
     const permissions = await this.prisma.getListGroupPermissionByGroup(
       groupPermissionListByGroupRequest,
     );
-    const transformedGroups = permissions.map((permissions) => {
-      const timestamps = transformTimestamps(
-        permissions.created_at,
-        null,
-        null,
-      );
-      return { ...permissions, ...timestamps };
+    const transformedGroups = permissions.map((permission) => {
+      const timestamps = transformTimestamps(permission.created_at, null, null);
+      return {
+        ...permission,
+        allow_ids: permission.allow_ids as number[],
+        ...timestamps,
+      };
     });
     return {
       data: transformedGroups,
@@ -68,7 +71,11 @@ export class GroupPermissionController {
           null,
           null,
         );
-        return { ...groupPermission, ...timestamps };
+        return {
+          ...groupPermission,
+          allow_ids: groupPermission.allow_ids as number[],
+          ...timestamps,
+        };
       },
     );
 

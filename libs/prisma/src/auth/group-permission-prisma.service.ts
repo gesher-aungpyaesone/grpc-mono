@@ -8,14 +8,23 @@ import {
   GroupPermissionListRequest,
 } from 'protos/dist/auth';
 import { PermissionService } from './permission-prisma.service';
+import { GroupService } from './group-prisma.service';
 import { AuthPrismaService } from './auth-prisma.service';
 import { validateFilter, validateRange, validateSort } from 'utils';
-import { GroupService } from './group-prisma.service';
+import { StaffPositionService } from './staff-position-prisma.service';
+import { UserService } from './user-prisma.service';
+import { StaffService } from './staff-prisma.service';
 
 export class GroupPermissionService {
   constructor(
     @Inject()
     private prisma: AuthPrismaService,
+    @Inject()
+    private readonly userService: UserService,
+    @Inject()
+    private readonly staffService: StaffService,
+    @Inject()
+    private readonly staffPositionService: StaffPositionService,
     @Inject()
     private readonly groupService: GroupService,
     @Inject()
@@ -58,7 +67,9 @@ export class GroupPermissionService {
     const parsedFilter = validateFilter(filter, fields);
     const queryOptions: Prisma.GroupPermissionFindManyArgs = {
       include: {
-        permission: true,
+        permission: {
+          include: { type: true, resource: true },
+        },
       },
     };
     if (parsedSort) {
@@ -103,39 +114,52 @@ export class GroupPermissionService {
   async assignGroupPermission(
     groupPermissionAssignRequest: GroupPermissionAssignRequest,
   ) {
-    const { group_id, permission_ids, created_by_id } =
-      groupPermissionAssignRequest;
+    const {
+      group_id,
+      permission_id,
+      is_allowed_all,
+      allow_ids,
+      created_by_id,
+    } = groupPermissionAssignRequest;
     await this.groupService.validateGroupExistence(group_id);
-    await this.permissionService.validatePermissionsExistence(permission_ids);
-
-    const existingAssignments = await this.prisma.groupPermission.findMany({
-      where: {
-        group_id,
-        permission_id: { in: permission_ids },
-      },
-      select: { permission_id: true },
+    await this.userService.validateUserExistence(created_by_id);
+    const permission =
+      await this.permissionService.validatePermissionExistence(permission_id);
+    if (!is_allowed_all && allow_ids) {
+      switch (permission.resource.name) {
+        case 'staff':
+          await this.staffService.validateStaffsExistence(allow_ids);
+          break;
+        case 'staff-position':
+          await this.staffPositionService.validateStaffPositionsExistence(
+            allow_ids,
+          );
+          break;
+        default:
+          break;
+      }
+    }
+    const existingPermission = await this.prisma.groupPermission.findFirst({
+      where: { permission_id, group_id },
     });
 
-    const alreadyAssignedPermissionIds = existingAssignments.map(
-      (assignment) => assignment.permission_id,
-    );
-
-    const permissionsToAssign = permission_ids.filter(
-      (permission_id) => !alreadyAssignedPermissionIds.includes(permission_id),
-    );
-
-    if (permissionsToAssign.length) {
-      const groupPermissions = permissionsToAssign.map((permission_id) => ({
-        group_id,
-        permission_id,
-        created_by_id,
-      }));
-
-      await this.prisma.groupPermission.createMany({
-        data: groupPermissions,
+    if (existingPermission) {
+      const updatedStaffPermission = await this.prisma.groupPermission.update({
+        where: { id: existingPermission.id },
+        data: { is_allowed_all, allow_ids },
       });
+      return updatedStaffPermission;
     }
 
-    return await this.getListGroupPermissionByGroup({ group_id });
+    const createdPermission = await this.prisma.groupPermission.create({
+      data: {
+        created_by_id,
+        group_id,
+        permission_id,
+        is_allowed_all,
+        allow_ids,
+      },
+    });
+    return createdPermission;
   }
 }

@@ -338,9 +338,8 @@ message Group {
 message GroupCreateRequest {
   string name = 1;
   optional string description = 2;
-  repeated int32 permission_ids = 3;
-  repeated int32 staff_ids = 4;
-  int32 created_by_id = 5;
+  repeated int32 staff_ids = 3;
+  int32 created_by_id = 4;
 }
 
 message GroupResponse {
@@ -388,12 +387,20 @@ message GroupPermission {
   optional Permission permission = 2;
   int32 created_by_id = 3;
   optional google.protobuf.Timestamp created_at = 4;
+  repeated int32 allow_ids = 5;
+  bool is_allowed_all = 6;
 }
 
 message GroupPermissionAssignRequest {
   int32 group_id = 1;
-  repeated int32 permission_ids = 2;
-  int32 created_by_id = 3;
+  int32 permission_id = 2;
+  bool is_allowed_all = 3;
+  repeated int32 allow_ids = 4;
+  int32 created_by_id = 5;
+}
+
+message GroupPermissionResponse {
+  GroupPermission data = 1;
 }
 
 message GroupPermissionListByGroupRequest {
@@ -412,7 +419,7 @@ message GroupPermissionListRequest {
 }
 
 service GroupPermissionService {
-  rpc assign (GroupPermissionAssignRequest) returns (GroupPermissionListResponse);
+  rpc assign (GroupPermissionAssignRequest) returns (GroupPermissionResponse);
   rpc getListByGroup (GroupPermissionListByGroupRequest) returns (GroupPermissionListResponse);
   rpc getList (GroupPermissionListRequest) returns (GroupPermissionListResponse);
 }

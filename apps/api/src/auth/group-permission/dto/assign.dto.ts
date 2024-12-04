@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsArray, IsInt, ArrayNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsArray, IsInt, IsBoolean } from 'class-validator';
 
 export class GroupPermissionAssignDto {
   @ApiProperty()
@@ -7,10 +7,19 @@ export class GroupPermissionAssignDto {
   @IsInt()
   group_id: number;
 
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsInt()
+  permission_id: number;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsBoolean()
+  is_allowed_all: boolean;
+
   @ApiProperty({ type: [Number] })
   @IsNotEmpty()
   @IsArray()
-  @ArrayNotEmpty()
   @IsInt({ each: true })
-  permission_ids: number[];
+  allow_ids: number[];
 }
