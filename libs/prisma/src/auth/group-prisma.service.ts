@@ -42,6 +42,22 @@ export class GroupService {
     return group;
   }
 
+  async validategroupsExistence(group_ids: number[]): Promise<Group[]> {
+    const groups = await this.prisma.group.findMany({
+      where: {
+        id: { in: group_ids },
+      },
+    });
+    if (groups.length !== group_ids.length) {
+      throw new RpcException({
+        code: grpc.status.NOT_FOUND,
+        message: 'One or more groups not found',
+      });
+    }
+
+    return groups;
+  }
+
   async createGroup(groupCreateRequest: GroupCreateRequest) {
     const { name, description, created_by_id, staff_ids } = groupCreateRequest;
 

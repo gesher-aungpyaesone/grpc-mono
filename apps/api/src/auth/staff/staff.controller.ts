@@ -56,7 +56,6 @@ export class StaffController implements OnModuleInit {
 
   @ApiBearerAuth()
   @UseGuards(StaffAuthGuard)
-  @StaffPermissionDecorator({ resource: 'staff', action: 'read' })
   @Get(':id')
   getOne(@Param('id') id: number): Observable<StaffResponse> {
     return this.staffService.getOne({ id: +id }).pipe(
@@ -68,7 +67,6 @@ export class StaffController implements OnModuleInit {
 
   @ApiBearerAuth()
   @UseGuards(StaffAuthGuard)
-  @StaffPermissionDecorator({ resource: 'staff', action: 'read' })
   @Get()
   getList(@Query() staffListDto: StaffListDto): Observable<StaffListResponse> {
     return this.staffService.getList({ ...staffListDto }).pipe(

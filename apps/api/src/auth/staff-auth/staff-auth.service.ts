@@ -75,7 +75,11 @@ export class StaffAuthService implements OnModuleInit {
       ),
     );
 
-    const allPermissions = permissions.data.concat(groupPermissions.data);
+    const staffPermissionList = permissions.data ? permissions.data : [];
+    const groupPermissionList = groupPermissions.data
+      ? groupPermissions.data
+      : [];
+    const allPermissions = staffPermissionList.concat(groupPermissionList);
     if (!allPermissions.length) {
       return false;
     }

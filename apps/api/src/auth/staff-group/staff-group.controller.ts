@@ -15,7 +15,6 @@ import {
   StaffGroupServiceClient,
 } from 'protos/dist/auth';
 import { StaffAuthGuard } from '../../guard';
-import { StaffPermissionDecorator } from '../../decorator';
 import { StaffGroupListDto } from './dto';
 import { catchError, Observable } from 'rxjs';
 import { handleError } from 'utils';
@@ -33,7 +32,6 @@ export class StaffGroupController implements OnModuleInit {
 
   @ApiBearerAuth()
   @UseGuards(StaffAuthGuard)
-  @StaffPermissionDecorator({ resource: 'staff', action: 'edit' })
   @Get()
   getList(
     @Query() staffGroupListDto: StaffGroupListDto,

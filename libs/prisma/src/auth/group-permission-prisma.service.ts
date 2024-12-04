@@ -135,6 +135,24 @@ export class GroupPermissionService {
     return { groupPermissions, totalCount };
   }
 
+  private async validateAllowIds(resource: string, allow_ids: number[]) {
+    switch (resource) {
+      case 'staff':
+        await this.staffService.validateStaffsExistence(allow_ids);
+        break;
+      case 'staff-position':
+        await this.staffPositionService.validateStaffPositionsExistence(
+          allow_ids,
+        );
+        break;
+      case 'group':
+        await this.groupService.validategroupsExistence(allow_ids);
+        break;
+      default:
+        break;
+    }
+  }
+
   async assignGroupPermission(
     groupPermissionAssignRequest: GroupPermissionAssignRequest,
   ) {
@@ -150,18 +168,7 @@ export class GroupPermissionService {
     const permission =
       await this.permissionService.validatePermissionExistence(permission_id);
     if (!is_allowed_all && allow_ids) {
-      switch (permission.resource.name) {
-        case 'staff':
-          await this.staffService.validateStaffsExistence(allow_ids);
-          break;
-        case 'staff-position':
-          await this.staffPositionService.validateStaffPositionsExistence(
-            allow_ids,
-          );
-          break;
-        default:
-          break;
-      }
+      await this.validateAllowIds(permission.resource.name, allow_ids);
     }
     const existingPermission = await this.prisma.groupPermission.findFirst({
       where: { permission_id, group_id },

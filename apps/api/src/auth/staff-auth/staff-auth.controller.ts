@@ -95,8 +95,8 @@ export class StaffAuthController implements OnModuleInit {
       }),
       staff: data,
       is_root: data.is_root,
-      permissions: permissions.data,
-      groupPermissions: groupPermissions.data,
+      permissions: permissions.data ? permissions.data : [],
+      groupPermissions: groupPermissions.data ? groupPermissions.data : [],
     };
   }
 
@@ -121,8 +121,8 @@ export class StaffAuthController implements OnModuleInit {
     return {
       staff,
       is_root: staff.is_root,
-      permissions: permissions.data,
-      groupPermissions: groupPermissions.data,
+      permissions: permissions.data ? permissions.data : [],
+      groupPermissions: groupPermissions.data ? groupPermissions.data : [],
     };
   }
 }

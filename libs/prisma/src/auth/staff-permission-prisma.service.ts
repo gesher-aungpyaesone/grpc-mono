@@ -13,6 +13,7 @@ import { AuthPrismaService } from './auth-prisma.service';
 import { validateFilter, validateRange, validateSort } from 'utils';
 import { StaffPositionService } from './staff-position-prisma.service';
 import { UserService } from './user-prisma.service';
+import { GroupService } from './group-prisma.service';
 
 export class StaffPermissionService {
   constructor(
@@ -24,6 +25,8 @@ export class StaffPermissionService {
     private readonly staffService: StaffService,
     @Inject()
     private readonly staffPositionService: StaffPositionService,
+    @Inject()
+    private readonly groupService: GroupService,
     @Inject()
     private readonly permissionService: PermissionService,
   ) {}
@@ -108,6 +111,24 @@ export class StaffPermissionService {
     return { staffPermissions, totalCount };
   }
 
+  private async validateAllowIds(resource: string, allow_ids: number[]) {
+    switch (resource) {
+      case 'staff':
+        await this.staffService.validateStaffsExistence(allow_ids);
+        break;
+      case 'staff-position':
+        await this.staffPositionService.validateStaffPositionsExistence(
+          allow_ids,
+        );
+        break;
+      case 'group':
+        await this.groupService.validategroupsExistence(allow_ids);
+        break;
+      default:
+        break;
+    }
+  }
+
   async assignStaffPermission(
     staffPermissionAssignRequest: StaffPermissionAssignRequest,
   ) {
@@ -124,18 +145,7 @@ export class StaffPermissionService {
     const permission =
       await this.permissionService.validatePermissionExistence(permission_id);
     if (!is_allowed_all && allow_ids) {
-      switch (permission.resource.name) {
-        case 'staff':
-          await this.staffService.validateStaffsExistence(allow_ids);
-          break;
-        case 'staff-position':
-          await this.staffPositionService.validateStaffPositionsExistence(
-            allow_ids,
-          );
-          break;
-        default:
-          break;
-      }
+      await this.validateAllowIds(permission.resource.name, allow_ids);
     }
 
     const existingPermission = await this.prisma.staffPermission.findFirst({

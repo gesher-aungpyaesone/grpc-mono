@@ -69,7 +69,6 @@ export class StaffPermissionController implements OnModuleInit {
 
   @ApiBearerAuth()
   @UseGuards(StaffAuthGuard)
-  @StaffPermissionDecorator({ resource: 'staff', action: 'edit' })
   @Get()
   getList(
     @Query() staffPermissionListDto: StaffPermissionListDto,
