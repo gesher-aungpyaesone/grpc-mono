@@ -5,10 +5,28 @@ const prisma = new PrismaClient();
 
 async function main() {
   // Create a staff position
-  const staffPosition = await prisma.staffPosition.create({
+  const rootPosition = await prisma.staffPosition.create({
+    data: {
+      name: 'CEO',
+      description: 'CEO of Gesher',
+      created_by_id: 1,
+      updated_by_id: 1,
+    },
+  });
+
+  const managerPosition = await prisma.staffPosition.create({
     data: {
       name: 'Manager',
-      description: 'Responsible for overseeing staff and operations.',
+      description: 'Manager of a specific sector',
+      created_by_id: 1,
+      updated_by_id: 1,
+    },
+  });
+
+  const employeePosition = await prisma.staffPosition.create({
+    data: {
+      name: 'Employee',
+      description: 'normal employee',
       created_by_id: 1,
       updated_by_id: 1,
     },
@@ -32,7 +50,7 @@ async function main() {
       email: 'root@example.com',
       password: hashedRootPassword,
       department: 'Administration',
-      position_id: staffPosition.id,
+      position_id: rootPosition.id,
       bio: 'Root staff with full administrative access.',
       created_by_id: 1,
       updated_by_id: 1,
@@ -45,55 +63,57 @@ async function main() {
       firstName: 'John',
       lastName: 'Doe',
       email: 'john.doe@example.com',
-      department: 'Sales',
+      department: 'IT',
+      positionId: managerPosition.id,
     },
     {
       firstName: 'Jane',
       lastName: 'Smith',
       email: 'jane.smith@example.com',
       department: 'Marketing',
+      positionId: managerPosition.id,
     },
     {
       firstName: 'Paul',
       lastName: 'Adams',
       email: 'paul.adams@example.com',
-      department: 'IT',
+      department: 'HR',
+      positionId: managerPosition.id,
     },
     {
       firstName: 'Sarah',
       lastName: 'Brown',
       email: 'sarah.brown@example.com',
-      department: 'HR',
+      department: 'Research',
+      positionId: managerPosition.id,
     },
     {
       firstName: 'Emily',
       lastName: 'Davis',
       email: 'emily.davis@example.com',
-      department: 'Finance',
+      department: 'IT',
+      positionId: employeePosition.id,
     },
     {
       firstName: 'Michael',
       lastName: 'Wilson',
       email: 'michael.wilson@example.com',
-      department: 'Operations',
+      department: 'Marketing',
+      positionId: employeePosition.id,
     },
     {
       firstName: 'David',
       lastName: 'Taylor',
       email: 'david.taylor@example.com',
-      department: 'Sales',
+      department: 'HR',
+      positionId: employeePosition.id,
     },
     {
       firstName: 'Rachel',
       lastName: 'Miller',
       email: 'rachel.miller@example.com',
-      department: 'Marketing',
-    },
-    {
-      firstName: 'Daniel',
-      lastName: 'Clark',
-      email: 'daniel.clark@example.com',
-      department: 'IT',
+      department: 'Research',
+      positionId: employeePosition.id,
     },
   ];
 
@@ -115,7 +135,7 @@ async function main() {
         email: member.email,
         password: hashedPassword,
         department: member.department,
-        position_id: staffPosition.id,
+        position_id: member.positionId,
         bio: `${member.firstName} ${member.lastName} working in the ${member.department} department.`,
         created_by_id: 1,
         updated_by_id: 1,
@@ -135,12 +155,27 @@ async function main() {
     data: { name: 'staff' },
   });
 
-  const permissionStaffPermissionResource = await prisma.permissionResource.create({
-    data: { name: 'staff-permission' },
+  const permissionGroupResource = await prisma.permissionResource.create({
+    data: { name: 'group' },
   });
 
-  // Create permissions for staff
-  const staffPermissions = [
+  const permissionPositionResource = await prisma.permissionResource.create({
+    data: { name: 'staff-position' },
+  });
+
+  const permissionStaffPermissionResource =
+    await prisma.permissionResource.create({
+      data: { name: 'staff-permission' },
+    });
+
+  const permissionGroupPermissionResource =
+    await prisma.permissionResource.create({
+      data: { name: 'group-permission' },
+    });
+
+  // Create permissions
+  const permissions = [
+    // staff
     {
       name: '[Staff] Create Staff',
       permissionType: 'create',
@@ -161,34 +196,30 @@ async function main() {
       permissionType: 'delete',
       resource: permissionStaffResource,
     },
+
+    // group
     {
-      name: '[Staff] Assign Staff Permission',
-      permissionType: 'assign',
-      resource: permissionStaffPermissionResource,
+      name: '[Group] Create Group',
+      permissionType: 'create',
+      resource: permissionGroupResource,
     },
-  ];
-
-  for (const perm of staffPermissions) {
-    const permissionType = await prisma.permissionType.findUnique({
-      where: { name: perm.permissionType },
-    });
-
-    await prisma.permission.create({
-      data: {
-        name: perm.name,
-        type: { connect: { id: permissionType.id } },
-        resource: { connect: { id: permissionStaffResource.id } },
-      },
-    });
-  }
-
-  // Create permission staff resource
-  const permissionPositionResource = await prisma.permissionResource.create({
-    data: { name: 'staff-position' },
-  });
-
-  // Create permissions for staff position
-  const staffPositionPermissions = [
+    {
+      name: '[Group] Read Group',
+      permissionType: 'read',
+      resource: permissionGroupResource,
+    },
+    {
+      name: '[Group] Edit Group',
+      permissionType: 'edit',
+      resource: permissionGroupResource,
+    },
+    {
+      name: '[Group] Delete Group',
+      permissionType: 'delete',
+      resource: permissionGroupResource,
+    },
+    
+    // positiion
     {
       name: '[Position] Create Staff Position',
       permissionType: 'create',
@@ -209,9 +240,21 @@ async function main() {
       permissionType: 'delete',
       resource: permissionPositionResource,
     },
+    
+    // permission assign
+    {
+      name: '[Staff Permission] Assign Permission',
+      permissionType: 'assign',
+      resource: permissionStaffPermissionResource,
+    },
+    {
+      name: '[Group Permission] Assign Permission',
+      permissionType: 'assign',
+      resource: permissionGroupPermissionResource,
+    },
   ];
 
-  for (const perm of staffPositionPermissions) {
+  for (const perm of permissions) {
     const permissionType = await prisma.permissionType.findUnique({
       where: { name: perm.permissionType },
     });
@@ -220,7 +263,7 @@ async function main() {
       data: {
         name: perm.name,
         type: { connect: { id: permissionType.id } },
-        resource: { connect: { id: permissionPositionResource.id } },
+        resource: { connect: { id: perm.resource.id } },
       },
     });
   }

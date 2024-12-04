@@ -2,6 +2,8 @@ import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import {
   AUTH_PACKAGE_NAME,
+  GROUP_PERMISSION_SERVICE_NAME,
+  GroupPermissionServiceClient,
   STAFF_PERMISSION_SERVICE_NAME,
   STAFF_SERVICE_NAME,
   StaffPermissionServiceClient,
@@ -15,6 +17,7 @@ import { handleError } from 'utils';
 export class StaffAuthService implements OnModuleInit {
   private staffService: StaffServiceClient;
   private staffPermissionService: StaffPermissionServiceClient;
+  private groupPermissionService: GroupPermissionServiceClient;
   constructor(
     private jwtService: JwtService,
     @Inject(AUTH_PACKAGE_NAME) private client: ClientGrpc,
@@ -26,6 +29,10 @@ export class StaffAuthService implements OnModuleInit {
     this.staffPermissionService =
       this.client.getService<StaffPermissionServiceClient>(
         STAFF_PERMISSION_SERVICE_NAME,
+      );
+    this.groupPermissionService =
+      this.client.getService<GroupPermissionServiceClient>(
+        GROUP_PERMISSION_SERVICE_NAME,
       );
   }
 
@@ -52,7 +59,7 @@ export class StaffAuthService implements OnModuleInit {
       action: string;
     },
   ) {
-    const { total_count, data } = await firstValueFrom(
+    const permissions = await firstValueFrom(
       this.staffPermissionService.getListByStaff({ staff_id }).pipe(
         catchError((error) => {
           throw handleError(error);
@@ -60,11 +67,20 @@ export class StaffAuthService implements OnModuleInit {
       ),
     );
 
-    if (!total_count) {
+    const groupPermissions = await firstValueFrom(
+      this.groupPermissionService.getListByStaff({ staff_id }).pipe(
+        catchError((error) => {
+          throw handleError(error);
+        }),
+      ),
+    );
+
+    const allPermissions = permissions.data.concat(groupPermissions.data);
+    if (!allPermissions.length) {
       return false;
     }
 
-    const allow = data.some(
+    const allow = allPermissions.some(
       (perm) =>
         perm.permission.resource.name == permission.resource &&
         perm.permission.type.name == permission.action,

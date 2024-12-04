@@ -39,7 +39,7 @@ export class StaffPermissionController implements OnModuleInit {
 
   @ApiBearerAuth()
   @UseGuards(StaffAuthGuard)
-  @StaffPermissionDecorator({ resource: 'staff', action: 'assign' })
+  @StaffPermissionDecorator({ resource: 'staff-permission', action: 'assign' })
   @Post()
   create(
     @Body() staffPermissionAssignDto: StaffPermissionAssignDto,

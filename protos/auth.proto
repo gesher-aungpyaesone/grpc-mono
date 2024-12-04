@@ -235,14 +235,16 @@ message StaffLoginRequest {
 message StaffLoginResponse {
   string access_token = 1;
   repeated StaffPermission permissions = 2;
-  bool is_root = 3;
-  Staff staff = 4;
+  repeated GroupPermission groupPermissions = 3;
+  bool is_root = 4;
+  Staff staff = 5;
 }
 
 message StaffGetMeResponse {
   repeated StaffPermission permissions = 1;
-  bool is_root = 2;
-  Staff staff = 3;
+  repeated GroupPermission groupPermissions = 2;
+  bool is_root = 3;
+  Staff staff = 4;
 }
 
 message StaffGetMeRequest {
@@ -407,6 +409,10 @@ message GroupPermissionListByGroupRequest {
   int32 group_id = 1;
 }
 
+message GroupPermissionListByStaffRequest {
+  int32 staff_id = 1;
+}
+
 message GroupPermissionListResponse {
   repeated GroupPermission data = 1;
   int32 total_count = 2;
@@ -421,6 +427,7 @@ message GroupPermissionListRequest {
 service GroupPermissionService {
   rpc assign (GroupPermissionAssignRequest) returns (GroupPermissionResponse);
   rpc getListByGroup (GroupPermissionListByGroupRequest) returns (GroupPermissionListResponse);
+  rpc getListByStaff (GroupPermissionListByStaffRequest) returns (GroupPermissionListResponse);
   rpc getList (GroupPermissionListRequest) returns (GroupPermissionListResponse);
 }
 

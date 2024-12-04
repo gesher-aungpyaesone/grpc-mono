@@ -5,6 +5,7 @@ import { Prisma } from '@prisma/auth-ms';
 import {
   GroupPermissionAssignRequest,
   GroupPermissionListByGroupRequest,
+  GroupPermissionListByStaffRequest,
   GroupPermissionListRequest,
 } from 'protos/dist/auth';
 import { PermissionService } from './permission-prisma.service';
@@ -55,6 +56,29 @@ export class GroupPermissionService {
         message: 'group not found',
       });
     return group.group_permissions;
+  }
+
+  async getListGroupPermissionByStaff(
+    groupPermissionListByStaffRequest: GroupPermissionListByStaffRequest,
+  ) {
+    const { staff_id } = groupPermissionListByStaffRequest;
+    const groupPermissions = await this.prisma.groupPermission.findMany({
+      where: {
+        group: {
+          staff_groups: {
+            some: {
+              staff_id: staff_id,
+            },
+          },
+        },
+      },
+      include: {
+        permission: {
+          include: { resource: true, type: true },
+        },
+      },
+    });
+    return groupPermissions;
   }
 
   async getListGroupPermission(

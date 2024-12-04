@@ -10,6 +10,8 @@ import {
 import { ClientGrpc } from '@nestjs/microservices';
 import {
   AUTH_PACKAGE_NAME,
+  GROUP_PERMISSION_SERVICE_NAME,
+  GroupPermissionServiceClient,
   Staff,
   STAFF_AUTH_SERVICE_NAME,
   STAFF_PERMISSION_SERVICE_NAME,
@@ -31,6 +33,7 @@ import { LoggedinStaff } from '../../decorator';
 export class StaffAuthController implements OnModuleInit {
   private staffAuthService: StaffAuthServiceClient;
   private staffPermissionService: StaffPermissionServiceClient;
+  private groupPermissionService: GroupPermissionServiceClient;
   constructor(
     @Inject(AUTH_PACKAGE_NAME) private client: ClientGrpc,
     private jwtService: JwtService,
@@ -43,6 +46,10 @@ export class StaffAuthController implements OnModuleInit {
     this.staffPermissionService =
       this.client.getService<StaffPermissionServiceClient>(
         STAFF_PERMISSION_SERVICE_NAME,
+      );
+    this.groupPermissionService =
+      this.client.getService<GroupPermissionServiceClient>(
+        GROUP_PERMISSION_SERVICE_NAME,
       );
   }
 
@@ -72,6 +79,13 @@ export class StaffAuthController implements OnModuleInit {
         }),
       ),
     );
+    const groupPermissions = await firstValueFrom(
+      this.groupPermissionService.getListByStaff({ staff_id: data.id }).pipe(
+        catchError((error) => {
+          throw handleError(error);
+        }),
+      ),
+    );
 
     return {
       access_token: this.jwtService.sign({
@@ -82,6 +96,7 @@ export class StaffAuthController implements OnModuleInit {
       staff: data,
       is_root: data.is_root,
       permissions: permissions.data,
+      groupPermissions: groupPermissions.data,
     };
   }
 
@@ -96,10 +111,18 @@ export class StaffAuthController implements OnModuleInit {
         }),
       ),
     );
+    const groupPermissions = await firstValueFrom(
+      this.groupPermissionService.getListByStaff({ staff_id: staff.id }).pipe(
+        catchError((error) => {
+          throw handleError(error);
+        }),
+      ),
+    );
     return {
       staff,
       is_root: staff.is_root,
       permissions: permissions.data,
+      groupPermissions: groupPermissions.data,
     };
   }
 }

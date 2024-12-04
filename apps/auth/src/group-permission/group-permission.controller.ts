@@ -5,6 +5,7 @@ import {
   GROUP_PERMISSION_SERVICE_NAME,
   GroupPermissionAssignRequest,
   GroupPermissionListByGroupRequest,
+  GroupPermissionListByStaffRequest,
   GroupPermissionListRequest,
   GroupPermissionListResponse,
   GroupPermissionResponse,
@@ -43,6 +44,27 @@ export class GroupPermissionController {
   ): Promise<GroupPermissionListResponse> {
     const permissions = await this.prisma.getListGroupPermissionByGroup(
       groupPermissionListByGroupRequest,
+    );
+    const transformedGroups = permissions.map((permission) => {
+      const timestamps = transformTimestamps(permission.created_at, null, null);
+      return {
+        ...permission,
+        allow_ids: permission.allow_ids as number[],
+        ...timestamps,
+      };
+    });
+    return {
+      data: transformedGroups,
+      total_count: transformedGroups.length,
+    };
+  }
+
+  @GrpcMethod(GROUP_PERMISSION_SERVICE_NAME, 'getListByStaff')
+  async getListByStaff(
+    groupPermissionListByStaffRequest: GroupPermissionListByStaffRequest,
+  ): Promise<GroupPermissionListResponse> {
+    const permissions = await this.prisma.getListGroupPermissionByStaff(
+      groupPermissionListByStaffRequest,
     );
     const transformedGroups = permissions.map((permission) => {
       const timestamps = transformTimestamps(permission.created_at, null, null);

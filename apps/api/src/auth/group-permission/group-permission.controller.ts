@@ -39,7 +39,7 @@ export class GroupPermissionController implements OnModuleInit {
 
   @ApiBearerAuth()
   @UseGuards(StaffAuthGuard)
-  @StaffPermissionDecorator({ resource: 'group', action: 'edit' })
+  @StaffPermissionDecorator({ resource: 'group-permission', action: 'assign' })
   @Post()
   create(
     @Body() groupPermissionAssignDto: GroupPermissionAssignDto,
@@ -76,6 +76,19 @@ export class GroupPermissionController implements OnModuleInit {
   ): Observable<GroupPermissionListResponse> {
     return this.groupPermissionService
       .getList({ ...groupPermissionListDto })
+      .pipe(
+        catchError((error) => {
+          throw handleError(error);
+        }),
+      );
+  }
+
+  @Get('by-staff/:staff_id')
+  getListByStaff(
+    @Param('staff_id') staff_id: number,
+  ): Observable<GroupPermissionListResponse> {
+    return this.groupPermissionService
+      .getListByStaff({ staff_id: +staff_id })
       .pipe(
         catchError((error) => {
           throw handleError(error);
