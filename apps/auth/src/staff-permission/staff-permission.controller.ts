@@ -31,6 +31,7 @@ export class StaffPermissionController {
     return {
       data: {
         ...createdStaffPermission,
+        allow_ids: createdStaffPermission.allow_ids as number[],
         ...timestamps,
       },
     };
@@ -43,13 +44,13 @@ export class StaffPermissionController {
     const permissions = await this.prisma.getListStaffPermissionByStaff(
       staffPermissionListByStaffRequest,
     );
-    const transformedStaffs = permissions.map((permissions) => {
-      const timestamps = transformTimestamps(
-        permissions.created_at,
-        null,
-        null,
-      );
-      return { ...permissions, ...timestamps };
+    const transformedStaffs = permissions.map((permission) => {
+      const timestamps = transformTimestamps(permission.created_at, null, null);
+      return {
+        ...permission,
+        allow_ids: permission.allow_ids as number[],
+        ...timestamps,
+      };
     });
     return {
       data: transformedStaffs,
@@ -70,7 +71,11 @@ export class StaffPermissionController {
           null,
           null,
         );
-        return { ...staffPermission, ...timestamps };
+        return {
+          ...staffPermission,
+          allow_ids: staffPermission.allow_ids as number[],
+          ...timestamps,
+        };
       },
     );
 

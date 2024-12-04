@@ -64,7 +64,9 @@ export class StaffPermissionService {
     const parsedFilter = validateFilter(filter, fields);
     const queryOptions: Prisma.StaffPermissionFindManyArgs = {
       include: {
-        permission: true,
+        permission: {
+          include: { type: true, resource: true },
+        },
       },
     };
     if (parsedSort) {
