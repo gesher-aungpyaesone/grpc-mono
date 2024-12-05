@@ -155,7 +155,7 @@ export class StaffPermissionService {
     if (existingPermission) {
       const updatedStaffPermission = await this.prisma.staffPermission.update({
         where: { id: existingPermission.id },
-        data: { is_allowed_all, allow_ids },
+        data: { is_allowed_all, allow_ids, created_by_id },
       });
       return updatedStaffPermission;
     }

@@ -3,14 +3,37 @@ import { Controller } from '@nestjs/common';
 import { GrpcMethod } from '@nestjs/microservices';
 import {
   STAFF_GROUP_SERVICE_NAME,
+  StaffGroupAssignRequest,
   StaffGroupListRequest,
   StaffGroupListResponse,
+  StaffGroupResponse,
 } from 'protos/dist/auth';
 import { transformTimestamps } from 'utils';
 
 @Controller('staff-group')
 export class StaffGroupController {
   constructor(private readonly prisma: StaffGroupService) {}
+
+  @GrpcMethod(STAFF_GROUP_SERVICE_NAME, 'assign') async assign(
+    staffGroupAssignRequest: StaffGroupAssignRequest,
+  ): Promise<StaffGroupResponse> {
+    const createdStaffGroup = await this.prisma.assignStaffGroup(
+      staffGroupAssignRequest,
+    );
+
+    const timestamps = transformTimestamps(
+      createdStaffGroup.created_at,
+      null,
+      null,
+    );
+
+    return {
+      data: {
+        ...createdStaffGroup,
+        ...timestamps,
+      },
+    };
+  }
 
   @GrpcMethod(STAFF_GROUP_SERVICE_NAME, 'getList')
   async getList(

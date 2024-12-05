@@ -177,7 +177,7 @@ export class GroupPermissionService {
     if (existingPermission) {
       const updatedStaffPermission = await this.prisma.groupPermission.update({
         where: { id: existingPermission.id },
-        data: { is_allowed_all, allow_ids },
+        data: { is_allowed_all, allow_ids, created_by_id },
       });
       return updatedStaffPermission;
     }

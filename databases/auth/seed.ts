@@ -173,6 +173,10 @@ async function main() {
       data: { name: 'group-permission' },
     });
 
+  const permissionStaffGroupResource = await prisma.permissionResource.create({
+    data: { name: 'staff-group' },
+  });
+
   // Create permissions
   const permissions = [
     // staff
@@ -218,7 +222,7 @@ async function main() {
       permissionType: 'delete',
       resource: permissionGroupResource,
     },
-    
+
     // positiion
     {
       name: '[Position] Create Staff Position',
@@ -240,7 +244,7 @@ async function main() {
       permissionType: 'delete',
       resource: permissionPositionResource,
     },
-    
+
     // permission assign
     {
       name: '[Staff Permission] Assign Permission',
@@ -251,6 +255,13 @@ async function main() {
       name: '[Group Permission] Assign Permission',
       permissionType: 'assign',
       resource: permissionGroupPermissionResource,
+    },
+
+    // group assign
+    {
+      name: '[Staff Group] Assign Group',
+      permissionType: 'assign',
+      resource: permissionStaffGroupResource,
     },
   ];
 

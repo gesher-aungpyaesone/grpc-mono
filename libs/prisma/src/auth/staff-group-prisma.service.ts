@@ -1,14 +1,54 @@
 import { Inject } from '@nestjs/common';
 import { Prisma } from '@prisma/auth-ms';
-import { StaffGroupListRequest } from 'protos/dist/auth';
+import {
+  StaffGroupAssignRequest,
+  StaffGroupListRequest,
+} from 'protos/dist/auth';
 import { AuthPrismaService } from './auth-prisma.service';
 import { validateFilter, validateRange, validateSort } from 'utils';
+import { UserService } from './user-prisma.service';
+import { StaffService } from './staff-prisma.service';
+import { GroupService } from './group-prisma.service';
 
 export class StaffGroupService {
   constructor(
     @Inject()
     private prisma: AuthPrismaService,
+    @Inject()
+    private readonly userService: UserService,
+    @Inject()
+    private readonly staffService: StaffService,
+    @Inject()
+    private readonly groupService: GroupService,
   ) {}
+  async assignStaffGroup(staffGroupAssignRequest: StaffGroupAssignRequest) {
+    const { staff_id, group_id, created_by_id } = staffGroupAssignRequest;
+
+    await this.staffService.validateStaffExistence(staff_id);
+    await this.userService.validateUserExistence(created_by_id);
+    await this.groupService.validateGroupExistence(group_id);
+
+    const existingGroup = await this.prisma.staffGroup.findFirst({
+      where: { group_id, staff_id },
+    });
+    if (existingGroup) {
+      const updatedStaffGroup = await this.prisma.staffGroup.update({
+        where: { id: existingGroup.id },
+        data: { created_by_id },
+      });
+      return updatedStaffGroup;
+    }
+
+    const createdGroup = await this.prisma.staffGroup.create({
+      data: {
+        created_by_id,
+        group_id,
+        staff_id,
+      },
+    });
+    return createdGroup;
+  }
+
   async getListStaffGroup(staffGroupListRequest: StaffGroupListRequest) {
     const { sort, range, filter } = staffGroupListRequest;
     const fields = Object.keys(Prisma.StaffGroupScalarFieldEnum);

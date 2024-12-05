@@ -1,8 +1,10 @@
 import {
+  Body,
   Controller,
   Get,
   Inject,
   OnModuleInit,
+  Post,
   Query,
   UseGuards,
 } from '@nestjs/common';
@@ -10,14 +12,17 @@ import { ClientGrpc } from '@nestjs/microservices';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import {
   AUTH_PACKAGE_NAME,
+  Staff,
   STAFF_GROUP_SERVICE_NAME,
   StaffGroupListResponse,
+  StaffGroupResponse,
   StaffGroupServiceClient,
 } from 'protos/dist/auth';
 import { StaffAuthGuard } from '../../guard';
-import { StaffGroupListDto } from './dto';
+import { StaffGroupAssignDto, StaffGroupListDto } from './dto';
 import { catchError, Observable } from 'rxjs';
 import { handleError } from 'utils';
+import { LoggedinStaff, StaffPermissionDecorator } from '../../decorator';
 
 @Controller('staff-group')
 export class StaffGroupController implements OnModuleInit {
@@ -28,6 +33,23 @@ export class StaffGroupController implements OnModuleInit {
     this.staffGroupService = this.client.getService<StaffGroupServiceClient>(
       STAFF_GROUP_SERVICE_NAME,
     );
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(StaffAuthGuard)
+  @StaffPermissionDecorator({ resource: 'staff-group', action: 'assign' })
+  @Post()
+  create(
+    @Body() staffGroupAssignDto: StaffGroupAssignDto,
+    @LoggedinStaff() staff: Staff,
+  ): Observable<StaffGroupResponse> {
+    return this.staffGroupService
+      .assign({ ...staffGroupAssignDto, created_by_id: staff.user_id })
+      .pipe(
+        catchError((error) => {
+          throw handleError(error);
+        }),
+      );
   }
 
   @ApiBearerAuth()
