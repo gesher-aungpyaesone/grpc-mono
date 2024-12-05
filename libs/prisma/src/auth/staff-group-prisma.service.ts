@@ -1,7 +1,8 @@
 import { Inject } from '@nestjs/common';
-import { Prisma } from '@prisma/auth-ms';
+import { Prisma, StaffGroup } from '@prisma/auth-ms';
 import {
   StaffGroupAssignRequest,
+  StaffGroupDeleteRequest,
   StaffGroupListRequest,
 } from 'protos/dist/auth';
 import { AuthPrismaService } from './auth-prisma.service';
@@ -9,6 +10,8 @@ import { validateFilter, validateRange, validateSort } from 'utils';
 import { UserService } from './user-prisma.service';
 import { StaffService } from './staff-prisma.service';
 import { GroupService } from './group-prisma.service';
+import { RpcException } from '@nestjs/microservices';
+import * as grpc from '@grpc/grpc-js';
 
 export class StaffGroupService {
   constructor(
@@ -21,6 +24,21 @@ export class StaffGroupService {
     @Inject()
     private readonly groupService: GroupService,
   ) {}
+
+  async validateStaffGroupExistence(id: number): Promise<StaffGroup> {
+    const existingStaff = await this.prisma.staffGroup.findUnique({
+      where: { id },
+    });
+
+    if (!existingStaff)
+      throw new RpcException({
+        code: grpc.status.NOT_FOUND,
+        message: 'staff group not found',
+      });
+
+    return existingStaff;
+  }
+
   async assignStaffGroup(staffGroupAssignRequest: StaffGroupAssignRequest) {
     const { staff_id, group_id, created_by_id } = staffGroupAssignRequest;
 
@@ -47,6 +65,15 @@ export class StaffGroupService {
       },
     });
     return createdGroup;
+  }
+
+  async deleteStaffGroup(staffGroupDeleteRequest: StaffGroupDeleteRequest) {
+    const { id } = staffGroupDeleteRequest;
+    await this.validateStaffGroupExistence(id);
+    const deletedStaffGroup = await this.prisma.staffGroup.delete({
+      where: { id },
+    });
+    return deletedStaffGroup;
   }
 
   async getListStaffGroup(staffGroupListRequest: StaffGroupListRequest) {

@@ -4,6 +4,7 @@ import { GrpcMethod } from '@nestjs/microservices';
 import {
   STAFF_GROUP_SERVICE_NAME,
   StaffGroupAssignRequest,
+  StaffGroupDeleteRequest,
   StaffGroupListRequest,
   StaffGroupListResponse,
   StaffGroupResponse,
@@ -50,6 +51,27 @@ export class StaffGroupController {
     return {
       data: transformedStaffGroups,
       total_count: totalCount,
+    };
+  }
+
+  @GrpcMethod(STAFF_GROUP_SERVICE_NAME, 'delete')
+  async delete(
+    staffGroupDeleteRequest: StaffGroupDeleteRequest,
+  ): Promise<StaffGroupResponse> {
+    const deletedStaffGroup = await this.prisma.deleteStaffGroup(
+      staffGroupDeleteRequest,
+    );
+    const timestamps = transformTimestamps(
+      deletedStaffGroup.created_at,
+      null,
+      null,
+    );
+
+    return {
+      data: {
+        ...deletedStaffGroup,
+        ...timestamps,
+      },
     };
   }
 }

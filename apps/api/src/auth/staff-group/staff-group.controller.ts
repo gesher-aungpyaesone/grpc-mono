@@ -1,9 +1,11 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Inject,
   OnModuleInit,
+  Param,
   Post,
   Query,
   UseGuards,
@@ -50,6 +52,18 @@ export class StaffGroupController implements OnModuleInit {
           throw handleError(error);
         }),
       );
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(StaffAuthGuard)
+  @StaffPermissionDecorator({ resource: 'staff-group', action: 'assign' })
+  @Delete(':id')
+  delete(@Param('id') id: number): Observable<StaffGroupResponse> {
+    return this.staffGroupService.delete({ id: +id }).pipe(
+      catchError((error) => {
+        throw handleError(error);
+      }),
+    );
   }
 
   @ApiBearerAuth()

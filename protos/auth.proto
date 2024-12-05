@@ -318,10 +318,15 @@ message StaffPermissionListRequest {
   optional string filter = 3; // {"field": "value", "field2": "value2"}
 }
 
+message StaffPermissionDeleteRequest {
+  int32 id = 1;
+}
+
 service StaffPermissionService {
   rpc assign (StaffPermissionAssignRequest) returns (StaffPermissionResponse);
   rpc getListByStaff (StaffPermissionListByStaffRequest) returns (StaffPermissionListResponse);
   rpc getList (StaffPermissionListRequest) returns (StaffPermissionListResponse);
+  rpc delete (StaffPermissionDeleteRequest) returns (StaffPermissionResponse);
 }
 
 // group
@@ -424,11 +429,16 @@ message GroupPermissionListRequest {
   optional string filter = 3; // {"field": "value", "field2": "value2"}
 }
 
+message GroupPermissionDeleteRequest {
+  int32 id = 1;
+}
+
 service GroupPermissionService {
   rpc assign (GroupPermissionAssignRequest) returns (GroupPermissionResponse);
   rpc getListByGroup (GroupPermissionListByGroupRequest) returns (GroupPermissionListResponse);
   rpc getListByStaff (GroupPermissionListByStaffRequest) returns (GroupPermissionListResponse);
   rpc getList (GroupPermissionListRequest) returns (GroupPermissionListResponse);
+  rpc delete (GroupPermissionDeleteRequest) returns (GroupPermissionResponse);
 }
 
 // staff group
@@ -461,7 +471,12 @@ message StaffGroupListRequest {
   optional string filter = 3; // {"field": "value", "field2": "value2"}
 }
 
+message StaffGroupDeleteRequest {
+  int32 id = 1;
+}
+
 service StaffGroupService {
   rpc assign (StaffGroupAssignRequest) returns (StaffGroupResponse);
   rpc getList (StaffGroupListRequest) returns (StaffGroupListResponse);
+  rpc delete (StaffGroupDeleteRequest) returns (StaffGroupResponse);
 }

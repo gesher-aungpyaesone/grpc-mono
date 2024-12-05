@@ -1,9 +1,10 @@
 import { Inject } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
 import * as grpc from '@grpc/grpc-js';
-import { Prisma } from '@prisma/auth-ms';
+import { GroupPermission, Prisma } from '@prisma/auth-ms';
 import {
   GroupPermissionAssignRequest,
+  GroupPermissionDeleteRequest,
   GroupPermissionListByGroupRequest,
   GroupPermissionListByStaffRequest,
   GroupPermissionListRequest,
@@ -31,6 +32,20 @@ export class GroupPermissionService {
     @Inject()
     private readonly permissionService: PermissionService,
   ) {}
+
+  async validateGroupPermissionExistence(id: number): Promise<GroupPermission> {
+    const existingGroup = await this.prisma.groupPermission.findUnique({
+      where: { id },
+    });
+
+    if (!existingGroup)
+      throw new RpcException({
+        code: grpc.status.NOT_FOUND,
+        message: 'group permission not found',
+      });
+
+    return existingGroup;
+  }
 
   async getListGroupPermissionByGroup(
     groupPermissionListByGroupRequest: GroupPermissionListByGroupRequest,
@@ -192,5 +207,16 @@ export class GroupPermissionService {
       },
     });
     return createdPermission;
+  }
+
+  async deleteGroupPermission(
+    staffPermissionDeleteRequest: GroupPermissionDeleteRequest,
+  ) {
+    const { id } = staffPermissionDeleteRequest;
+    await this.validateGroupPermissionExistence(id);
+    const deletedGroupPermission = await this.prisma.groupPermission.delete({
+      where: { id },
+    });
+    return deletedGroupPermission;
   }
 }

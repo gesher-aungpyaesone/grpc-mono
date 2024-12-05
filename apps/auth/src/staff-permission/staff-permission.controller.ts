@@ -4,6 +4,7 @@ import { GrpcMethod } from '@nestjs/microservices';
 import {
   STAFF_PERMISSION_SERVICE_NAME,
   StaffPermissionAssignRequest,
+  StaffPermissionDeleteRequest,
   StaffPermissionListByStaffRequest,
   StaffPermissionListRequest,
   StaffPermissionListResponse,
@@ -82,6 +83,28 @@ export class StaffPermissionController {
     return {
       data: transformedStaffPermissions,
       total_count: totalCount,
+    };
+  }
+
+  @GrpcMethod(STAFF_PERMISSION_SERVICE_NAME, 'delete')
+  async delete(
+    staffPermissionDeleteRequest: StaffPermissionDeleteRequest,
+  ): Promise<StaffPermissionResponse> {
+    const deletedStaffPermission = await this.prisma.deleteStaffPermission(
+      staffPermissionDeleteRequest,
+    );
+    const timestamps = transformTimestamps(
+      deletedStaffPermission.created_at,
+      null,
+      null,
+    );
+
+    return {
+      data: {
+        ...deletedStaffPermission,
+        allow_ids: deletedStaffPermission.allow_ids as number[],
+        ...timestamps,
+      },
     };
   }
 }

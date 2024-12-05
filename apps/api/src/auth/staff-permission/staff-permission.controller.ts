@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Inject,
   OnModuleInit,
@@ -52,6 +53,21 @@ export class StaffPermissionController implements OnModuleInit {
           throw handleError(error);
         }),
       );
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(StaffAuthGuard)
+  @StaffPermissionDecorator({
+    resource: 'staff-permission',
+    action: 'assign',
+  })
+  @Delete(':id')
+  delete(@Param('id') id: number): Observable<StaffPermissionResponse> {
+    return this.staffPermissionService.delete({ id: +id }).pipe(
+      catchError((error) => {
+        throw handleError(error);
+      }),
+    );
   }
 
   @Get('by/:staff_id')

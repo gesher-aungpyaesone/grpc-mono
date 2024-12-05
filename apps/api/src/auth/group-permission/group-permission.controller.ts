@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Inject,
   OnModuleInit,
@@ -52,6 +53,21 @@ export class GroupPermissionController implements OnModuleInit {
           throw handleError(error);
         }),
       );
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(StaffAuthGuard)
+  @StaffPermissionDecorator({
+    resource: 'group-permission',
+    action: 'assign',
+  })
+  @Delete(':id')
+  delete(@Param('id') id: number): Observable<GroupPermissionResponse> {
+    return this.groupPermissionService.delete({ id: +id }).pipe(
+      catchError((error) => {
+        throw handleError(error);
+      }),
+    );
   }
 
   @Get('by/:group_id')

@@ -1,9 +1,10 @@
 import { Inject } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
 import * as grpc from '@grpc/grpc-js';
-import { Prisma } from '@prisma/auth-ms';
+import { Prisma, StaffPermission } from '@prisma/auth-ms';
 import {
   StaffPermissionAssignRequest,
+  StaffPermissionDeleteRequest,
   StaffPermissionListByStaffRequest,
   StaffPermissionListRequest,
 } from 'protos/dist/auth';
@@ -30,6 +31,20 @@ export class StaffPermissionService {
     @Inject()
     private readonly permissionService: PermissionService,
   ) {}
+
+  async validateStaffPermissionExistence(id: number): Promise<StaffPermission> {
+    const existingStaff = await this.prisma.staffPermission.findUnique({
+      where: { id },
+    });
+
+    if (!existingStaff)
+      throw new RpcException({
+        code: grpc.status.NOT_FOUND,
+        message: 'staff permission not found',
+      });
+
+    return existingStaff;
+  }
 
   async getListStaffPermissionByStaff(
     staffPermissionListByStaffRequest: StaffPermissionListByStaffRequest,
@@ -170,5 +185,16 @@ export class StaffPermissionService {
       },
     });
     return createdStaffPermission;
+  }
+
+  async deleteStaffPermission(
+    staffPermissionDeleteRequest: StaffPermissionDeleteRequest,
+  ) {
+    const { id } = staffPermissionDeleteRequest;
+    await this.validateStaffPermissionExistence(id);
+    const deletedStaffPermission = await this.prisma.staffPermission.delete({
+      where: { id },
+    });
+    return deletedStaffPermission;
   }
 }
