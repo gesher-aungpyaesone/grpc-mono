@@ -28,6 +28,14 @@ export class StaffGroupService {
   async validateStaffGroupExistence(id: number): Promise<StaffGroup> {
     const existingStaff = await this.prisma.staffGroup.findUnique({
       where: { id },
+      include: {
+        staff: {
+          include: {
+            position: true,
+            department: true,
+          },
+        },
+      },
     });
 
     if (!existingStaff)
@@ -48,6 +56,14 @@ export class StaffGroupService {
 
     const existingGroup = await this.prisma.staffGroup.findFirst({
       where: { group_id, staff_id },
+      include: {
+        staff: {
+          include: {
+            position: true,
+            department: true,
+          },
+        },
+      },
     });
     if (existingGroup) {
       const updatedStaffGroup = await this.prisma.staffGroup.update({
@@ -85,7 +101,12 @@ export class StaffGroupService {
     const queryOptions: Prisma.StaffGroupFindManyArgs = {
       include: {
         group: true,
-        staff: true,
+        staff: {
+          include: {
+            position: true,
+            department: true,
+          },
+        },
       },
     };
     if (parsedSort) {
