@@ -12,6 +12,7 @@ import { StaffPermissionModule } from './staff-permission/staff-permission.modul
 import { GroupModule } from './group/group.module';
 import { GroupPermissionModule } from './group-permission/group-permission.module';
 import { StaffGroupModule } from './staff-group/staff-group.module';
+import { StaffDepartmentModule } from './staff-department/staff-department.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { StaffGroupModule } from './staff-group/staff-group.module';
     PrismaModule,
     StaffModule,
     StaffPositionModule,
+    StaffDepartmentModule,
     StaffAuthModule,
     UserModule,
     PermissionModule,

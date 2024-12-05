@@ -41,6 +41,21 @@ model StaffPosition {
     @@map("staff_positions")
 }
 
+model StaffDepartment {
+    id            Int       @id @default(autoincrement())
+    name          String    @db.VarChar(255)
+    description   String?   @db.Text
+    created_at    DateTime  @default(now())
+    updated_at    DateTime  @updatedAt
+    deleted_at    DateTime?
+    created_by_id Int
+    updated_by_id Int
+    deleted_by_id Int?
+    staffs        Staff[]
+
+    @@map("staff_departments")
+}
+
 model Staff {
     id                Int               @id @default(autoincrement())
     is_root           Boolean           @default(false)
@@ -50,9 +65,10 @@ model Staff {
     last_name         String            @db.VarChar(255)
     email             String            @unique @db.VarChar(255)
     password          String            @db.VarChar(255)
-    department        String            @db.VarChar(255)
     position          StaffPosition     @relation(fields: [position_id], references: [id])
     position_id       Int
+    department        StaffDepartment   @relation(fields: [department_id], references: [id])
+    department_id     Int
     profile_path      String?           @db.VarChar(255)
     cover_photo_path  String?           @db.VarChar(255)
     bio               String?           @db.Text

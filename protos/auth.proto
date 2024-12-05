@@ -95,7 +95,7 @@ message Staff {
   string last_name = 4;
   string email = 5;
   bool is_root = 6;
-  string department = 7;
+  int32 department_id = 7;
   int32 position_id = 8;
   optional string profile_path = 9;
   optional string cover_photo_path = 10;
@@ -106,6 +106,8 @@ message Staff {
   optional int32 created_by_id = 15;
   optional int32 updated_by_id = 16;
   optional int32 deleted_by_id = 17;
+  optional StaffPosition position = 18;
+  optional StaffDepartment department = 19;
 }
 
 message StaffCreateRequest {
@@ -113,7 +115,7 @@ message StaffCreateRequest {
   string last_name = 2;
   string email = 3;
   string password = 4;
-  string department = 5;
+  int32 department_id = 5;
   int32 position_id = 6;
   optional string profile_path = 7;
   optional string cover_photo_path = 8;
@@ -130,7 +132,7 @@ message StaffUpdateRequest {
   string last_name = 2;
   string email = 3;
   optional string password = 4;
-  string department = 5;
+  int32 department_id = 5;
   int32 position_id = 6;
   optional string profile_path = 7;
   optional string cover_photo_path = 8;
@@ -223,6 +225,64 @@ service StaffPositionService {
   rpc delete (StaffPositionDeleteRequest) returns (StaffPositionResponse);
   rpc getOne (StaffPositionGetOneRequest) returns (StaffPositionResponse);
   rpc getList (StaffPositionListRequest) returns (StaffPositionListResponse);
+}
+
+// staff department
+message StaffDepartment {
+  int32 id = 1;
+  string name = 2;
+  optional string description = 3;
+  optional google.protobuf.Timestamp created_at = 4;
+  optional google.protobuf.Timestamp updated_at = 5;
+  optional google.protobuf.Timestamp deleted_at = 6;
+  optional int32 created_by_id = 7;
+  optional int32 updated_by_id = 8;
+  optional int32 deleted_by_id = 9;
+}
+
+message StaffDepartmentCreateRequest {
+  string name = 1;
+  optional string description = 2;
+  int32 created_by_id = 3;
+}
+
+message StaffDepartmentResponse {
+  StaffDepartment data = 1;
+}
+
+message StaffDepartmentUpdateRequest {
+  string name = 1;
+  optional string description = 2;
+  int32 updated_by_id = 3;
+  int32 id = 4;
+}
+
+message StaffDepartmentDeleteRequest {
+  int32 id = 1;
+  optional int32 deleted_by_id = 2;
+}
+
+message StaffDepartmentListRequest {
+  optional string sort = 1; // ["field_name", "ASC/DESC"]
+  optional string range = 2;  // [start, end]
+  optional string filter = 3; // {"field": "value", "field2": "value2"}
+}
+
+message StaffDepartmentGetOneRequest {
+  int32 id = 1;
+}
+
+message StaffDepartmentListResponse {
+  repeated StaffDepartment data = 1;
+  int32 total_count = 2;
+}
+
+service StaffDepartmentService {
+  rpc create (StaffDepartmentCreateRequest) returns (StaffDepartmentResponse);
+  rpc update (StaffDepartmentUpdateRequest) returns (StaffDepartmentResponse);
+  rpc delete (StaffDepartmentDeleteRequest) returns (StaffDepartmentResponse);
+  rpc getOne (StaffDepartmentGetOneRequest) returns (StaffDepartmentResponse);
+  rpc getList (StaffDepartmentListRequest) returns (StaffDepartmentListResponse);
 }
 
 // staff auth

@@ -12,6 +12,7 @@ import {
   StaffModule,
   StaffPermissionModule,
   StaffPositionModule,
+  StaffDepartmentModule,
   UserModule,
 } from './auth';
 
@@ -25,6 +26,7 @@ import {
     UserModule,
     StaffAuthModule,
     StaffPositionModule,
+    StaffDepartmentModule,
     StaffModule,
     StaffPermissionModule,
     GroupModule,

@@ -4,6 +4,51 @@ const bcrypt = require('bcrypt');
 const prisma = new PrismaClient();
 
 async function main() {
+  // Create staff departments
+  const adminDepartment = await prisma.staffDepartment.create({
+    data: {
+      name: 'Administration',
+      description: 'Administration',
+      created_by_id: 1,
+      updated_by_id: 1,
+    },
+  })
+  const itDepartment = await prisma.staffDepartment.create({
+    data: {
+      name: 'IT',
+      description: 'Information Technology department',
+      created_by_id: 1,
+      updated_by_id: 1,
+    },
+  });
+
+  const marketingDepartment = await prisma.staffDepartment.create({
+    data: {
+      name: 'Marketing',
+      description: 'Marketing department',
+      created_by_id: 1,
+      updated_by_id: 1,
+    },
+  });
+
+  const hrDepartment = await prisma.staffDepartment.create({
+    data: {
+      name: 'HR',
+      description: 'Human Resources department',
+      created_by_id: 1,
+      updated_by_id: 1,
+    },
+  });
+
+  const researchDepartment = await prisma.staffDepartment.create({
+    data: {
+      name: 'Research',
+      description: 'Research and Development department',
+      created_by_id: 1,
+      updated_by_id: 1,
+    },
+  });
+
   // Create a staff position
   const rootPosition = await prisma.staffPosition.create({
     data: {
@@ -49,7 +94,7 @@ async function main() {
       last_name: 'Staff',
       email: 'root@example.com',
       password: hashedRootPassword,
-      department: 'Administration',
+      department_id: adminDepartment.id,
       position_id: rootPosition.id,
       bio: 'Root staff with full administrative access.',
       created_by_id: 1,
@@ -63,56 +108,56 @@ async function main() {
       firstName: 'John',
       lastName: 'Doe',
       email: 'john.doe@example.com',
-      department: 'IT',
+      department_id: itDepartment.id,
       positionId: managerPosition.id,
     },
     {
       firstName: 'Jane',
       lastName: 'Smith',
       email: 'jane.smith@example.com',
-      department: 'Marketing',
+      department_id: marketingDepartment.id,
       positionId: managerPosition.id,
     },
     {
       firstName: 'Paul',
       lastName: 'Adams',
       email: 'paul.adams@example.com',
-      department: 'HR',
+      department_id: hrDepartment.id,
       positionId: managerPosition.id,
     },
     {
       firstName: 'Sarah',
       lastName: 'Brown',
       email: 'sarah.brown@example.com',
-      department: 'Research',
+      department_id: researchDepartment.id,
       positionId: managerPosition.id,
     },
     {
       firstName: 'Emily',
       lastName: 'Davis',
       email: 'emily.davis@example.com',
-      department: 'IT',
+      department_id: itDepartment.id,
       positionId: employeePosition.id,
     },
     {
       firstName: 'Michael',
       lastName: 'Wilson',
       email: 'michael.wilson@example.com',
-      department: 'Marketing',
+      department_id: marketingDepartment.id,
       positionId: employeePosition.id,
     },
     {
       firstName: 'David',
       lastName: 'Taylor',
       email: 'david.taylor@example.com',
-      department: 'HR',
+      department_id: hrDepartment.id,
       positionId: employeePosition.id,
     },
     {
       firstName: 'Rachel',
       lastName: 'Miller',
       email: 'rachel.miller@example.com',
-      department: 'Research',
+      department_id: researchDepartment.id,
       positionId: employeePosition.id,
     },
   ];
@@ -134,7 +179,7 @@ async function main() {
         last_name: member.lastName,
         email: member.email,
         password: hashedPassword,
-        department: member.department,
+        department_id: member.department_id,
         position_id: member.positionId,
         bio: `${member.firstName} ${member.lastName} working in the ${member.department} department.`,
         created_by_id: 1,

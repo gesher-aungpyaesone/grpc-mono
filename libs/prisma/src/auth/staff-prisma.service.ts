@@ -17,6 +17,7 @@ import {
 } from 'protos/dist/auth';
 import { StaffPositionService } from './staff-position-prisma.service';
 import { AuthPrismaService } from './auth-prisma.service';
+import { StaffDepartmentService } from './staff-department-prisma.service';
 
 export class StaffService {
   constructor(
@@ -24,11 +25,17 @@ export class StaffService {
     private prisma: AuthPrismaService,
     @Inject()
     private readonly staffPositionService: StaffPositionService,
+    @Inject()
+    private readonly staffDepartmentService: StaffDepartmentService,
   ) {}
 
   async validateStaffEmailUniqueness(email: string): Promise<void> {
     const existingStaff = await this.prisma.staff.findUnique({
       where: { email },
+      include: {
+        position: true,
+        department: true,
+      },
     });
 
     if (existingStaff) {
@@ -42,6 +49,10 @@ export class StaffService {
   async validateStaffExistenceByEmail(email: string): Promise<Staff> {
     const existingStaff = await this.prisma.staff.findUnique({
       where: { email },
+      include: {
+        position: true,
+        department: true,
+      },
     });
 
     if (!existingStaff || (existingStaff && existingStaff.deleted_at))
@@ -56,6 +67,10 @@ export class StaffService {
   async validateStaffExistence(staff_id: number): Promise<Staff> {
     const existingStaff = await this.prisma.staff.findUnique({
       where: { id: staff_id },
+      include: {
+        position: true,
+        department: true,
+      },
     });
 
     if (!existingStaff || (existingStaff && existingStaff.deleted_at))
@@ -71,6 +86,10 @@ export class StaffService {
       where: {
         id: { in: staff_ids },
       },
+      include: {
+        position: true,
+        department: true,
+      },
     });
     if (staffs.length !== staff_ids.length) {
       throw new RpcException({
@@ -83,10 +102,13 @@ export class StaffService {
   }
 
   async createStaff(staffCreateRequest: StaffCreateRequest) {
-    const { email, password, position_id } = staffCreateRequest;
+    const { email, password, position_id, department_id } = staffCreateRequest;
 
     await this.validateStaffEmailUniqueness(email);
     await this.staffPositionService.validateStaffPositionExistence(position_id);
+    await this.staffDepartmentService.validateStaffDepartmentExistence(
+      department_id,
+    );
 
     const hashedPassword = await hashPassword(password);
 
@@ -99,7 +121,7 @@ export class StaffService {
         last_name: staffCreateRequest.last_name,
         email: staffCreateRequest.email,
         password: hashedPassword,
-        department: staffCreateRequest.department,
+        department: { connect: { id: staffCreateRequest.department_id } },
         profile_path: staffCreateRequest.profile_path,
         cover_photo_path: staffCreateRequest.cover_photo_path,
         bio: staffCreateRequest.bio,
@@ -132,6 +154,10 @@ export class StaffService {
     const parsedFilter = validateFilter(filter, fields);
     const queryOptions: Prisma.StaffFindManyArgs = {
       where: { deleted_at: null },
+      include: {
+        position: true,
+        department: true,
+      },
     };
     if (parsedSort) {
       const [field, order] = parsedSort;
@@ -174,13 +200,17 @@ export class StaffService {
   }
 
   async updateStaff(staffUpdateRequest: StaffUpdateRequest) {
-    const { id, email, password, position_id } = staffUpdateRequest;
+    const { id, email, password, position_id, department_id } =
+      staffUpdateRequest;
 
     const existingStaff = await this.validateStaffExistence(id);
 
     if (existingStaff.email !== email)
       await this.validateStaffEmailUniqueness(email);
     await this.staffPositionService.validateStaffPositionExistence(position_id);
+    await this.staffDepartmentService.validateStaffDepartmentExistence(
+      department_id,
+    );
 
     const hashedPassword = password
       ? await hashPassword(password)
@@ -193,7 +223,7 @@ export class StaffService {
         last_name: staffUpdateRequest.last_name,
         email: staffUpdateRequest.email,
         password: hashedPassword,
-        department: staffUpdateRequest.department,
+        department: { connect: { id: staffUpdateRequest.department_id } },
         profile_path: staffUpdateRequest.profile_path,
         cover_photo_path: staffUpdateRequest.cover_photo_path,
         bio: staffUpdateRequest.bio,

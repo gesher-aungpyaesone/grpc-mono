@@ -33,9 +33,9 @@ export class StaffCreateDto {
   password: string;
 
   @ApiProperty()
-  @IsString()
+  @IsInt()
   @IsNotEmpty()
-  department: string;
+  department_id: number;
 
   @ApiProperty()
   @IsInt()
