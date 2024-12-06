@@ -181,7 +181,7 @@ async function main() {
         password: hashedPassword,
         department_id: member.department_id,
         position_id: member.positionId,
-        bio: `${member.firstName} ${member.lastName} working in the ${member.department} department.`,
+        bio: `${member.firstName} ${member.lastName} working in #${member.department_id} department.`,
         created_by_id: 1,
         updated_by_id: 1,
       },
@@ -202,6 +202,10 @@ async function main() {
 
   const permissionGroupResource = await prisma.permissionResource.create({
     data: { name: 'group' },
+  });
+
+  const permissionDepartmentResource = await prisma.permissionResource.create({
+    data: { name: 'department' },
   });
 
   const permissionPositionResource = await prisma.permissionResource.create({
@@ -266,6 +270,28 @@ async function main() {
       name: '[Group] Delete Group',
       permissionType: 'delete',
       resource: permissionGroupResource,
+    },
+
+    // department
+    {
+      name: '[Department] Create Staff Department',
+      permissionType: 'create',
+      resource: permissionDepartmentResource,
+    },
+    {
+      name: '[Department] Read Staff Department',
+      permissionType: 'read',
+      resource: permissionDepartmentResource,
+    },
+    {
+      name: '[Department] Edit Staff Department',
+      permissionType: 'edit',
+      resource: permissionDepartmentResource,
+    },
+    {
+      name: '[Department] Delete Staff Department',
+      permissionType: 'delete',
+      resource: permissionDepartmentResource,
     },
 
     // positiion

@@ -86,7 +86,7 @@ export const validateFilter = (
       const filterKeys = Object.keys(parsedFilter);
 
       for (const key of filterKeys) {
-        if (!fields.includes(key) && key !== 'q') {
+        if (!fields.includes(key) && key !== 'q' && key !== 'exclude') {
           throw new RpcException({
             code: grpc.status.INVALID_ARGUMENT,
             message: JSON.stringify({

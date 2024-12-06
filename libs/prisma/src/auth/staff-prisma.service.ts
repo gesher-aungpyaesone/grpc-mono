@@ -146,6 +146,32 @@ export class StaffService {
     return await this.validateStaffExistence(id);
   }
 
+  getFilterConditions(parsedFilter: Record<string, any>): Record<string, any> {
+    const filterConditions: Record<string, any> = {};
+
+    for (let key in parsedFilter) {
+      const filterValue = parsedFilter[key];
+
+      if (key === 'q') {
+        key = 'email';
+      }
+
+      if (key === 'exclude' && parsedFilter[key]) {
+        filterConditions['is_root'] = false;
+      } else if (key === 'id' && Array.isArray(filterValue)) {
+        filterConditions[key] = { in: filterValue };
+      } else if (typeof filterValue === 'string') {
+        filterConditions[key] = {
+          contains: filterValue,
+        };
+      } else {
+        filterConditions[key] = filterValue;
+      }
+    }
+
+    return filterConditions;
+  }
+
   async getListStaff(staffListRequest: StaffListRequest) {
     const { sort, range, filter } = staffListRequest;
     const fields = Object.keys(Prisma.StaffScalarFieldEnum);
@@ -169,22 +195,7 @@ export class StaffService {
       queryOptions.take = parsedRange[1] - parsedRange[0];
     }
     if (parsedFilter && Object.keys(parsedFilter).length > 0) {
-      const filterConditions: Record<string, any> = {};
-      for (let key in parsedFilter) {
-        const filterValue = parsedFilter[key];
-        if (key === 'q') {
-          key = 'email';
-        }
-        if (key === 'id' && Array.isArray(filterValue)) {
-          filterConditions[key] = { in: filterValue };
-        } else if (typeof filterValue === 'string') {
-          filterConditions[key] = {
-            contains: filterValue,
-          };
-        } else {
-          filterConditions[key] = filterValue;
-        }
-      }
+      const filterConditions = this.getFilterConditions(parsedFilter);
 
       queryOptions.where = {
         ...queryOptions.where,
