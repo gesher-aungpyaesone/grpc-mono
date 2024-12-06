@@ -68,12 +68,17 @@ export class GroupController implements OnModuleInit {
   @ApiBearerAuth()
   @UseGuards(StaffAuthGuard)
   @Get()
-  getList(@Query() groupListDto: GroupListDto): Observable<GroupListResponse> {
-    return this.groupService.getList({ ...groupListDto }).pipe(
-      catchError((error) => {
-        throw handleError(error);
-      }),
-    );
+  getList(
+    @Query() groupListDto: GroupListDto,
+    @LoggedinStaff() staff: Staff,
+  ): Observable<GroupListResponse> {
+    return this.groupService
+      .getList({ ...groupListDto, current_user_id: staff.user_id })
+      .pipe(
+        catchError((error) => {
+          throw handleError(error);
+        }),
+      );
   }
 
   @ApiBearerAuth()

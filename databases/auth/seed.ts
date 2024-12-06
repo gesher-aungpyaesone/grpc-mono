@@ -205,7 +205,7 @@ async function main() {
   });
 
   const permissionDepartmentResource = await prisma.permissionResource.create({
-    data: { name: 'department' },
+    data: { name: 'staff-department' },
   });
 
   const permissionPositionResource = await prisma.permissionResource.create({

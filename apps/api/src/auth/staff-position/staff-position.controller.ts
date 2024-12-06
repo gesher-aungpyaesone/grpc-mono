@@ -76,12 +76,15 @@ export class StaffPositionController implements OnModuleInit {
   @Get()
   getList(
     @Query() staffPositionListDto: StaffPositionListDto,
+    @LoggedinStaff() staff: Staff,
   ): Observable<StaffPositionListResponse> {
-    return this.staffPositionService.getList({ ...staffPositionListDto }).pipe(
-      catchError((error) => {
-        throw handleError(error);
-      }),
-    );
+    return this.staffPositionService
+      .getList({ ...staffPositionListDto, current_user_id: staff.user_id })
+      .pipe(
+        catchError((error) => {
+          throw handleError(error);
+        }),
+      );
   }
 
   @ApiBearerAuth()

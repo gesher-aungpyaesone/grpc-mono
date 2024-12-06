@@ -68,12 +68,17 @@ export class StaffController implements OnModuleInit {
   @ApiBearerAuth()
   @UseGuards(StaffAuthGuard)
   @Get()
-  getList(@Query() staffListDto: StaffListDto): Observable<StaffListResponse> {
-    return this.staffService.getList({ ...staffListDto }).pipe(
-      catchError((error) => {
-        throw handleError(error);
-      }),
-    );
+  getList(
+    @Query() staffListDto: StaffListDto,
+    @LoggedinStaff() staff: Staff,
+  ): Observable<StaffListResponse> {
+    return this.staffService
+      .getList({ ...staffListDto, current_user_id: staff.user_id })
+      .pipe(
+        catchError((error) => {
+          throw handleError(error);
+        }),
+      );
   }
 
   @ApiBearerAuth()

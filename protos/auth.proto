@@ -150,6 +150,7 @@ message StaffListRequest {
   optional string sort = 1; // ["field_name", "ASC/DESC"]
   optional string range = 2;  // [start, end]
   optional string filter = 3; // {"field": "value", "field2": "value2"}
+  optional int32 current_user_id = 4;
 }
 
 message StaffGetOneRequest {
@@ -208,6 +209,7 @@ message StaffPositionListRequest {
   optional string sort = 1; // ["field_name", "ASC/DESC"]
   optional string range = 2;  // [start, end]
   optional string filter = 3; // {"field": "value", "field2": "value2"}
+  optional int32 current_user_id = 4;
 }
 
 message StaffPositionGetOneRequest {
@@ -266,6 +268,7 @@ message StaffDepartmentListRequest {
   optional string sort = 1; // ["field_name", "ASC/DESC"]
   optional string range = 2;  // [start, end]
   optional string filter = 3; // {"field": "value", "field2": "value2"}
+  optional int32  current_user_id = 4;
 }
 
 message StaffDepartmentGetOneRequest {
@@ -429,6 +432,7 @@ message GroupListRequest {
   optional string sort = 1; // ["field_name", "ASC/DESC"]
   optional string range = 2;  // [start, end]
   optional string filter = 3; // {"field": "value", "field2": "value2"}
+  optional int32  current_user_id = 4;
 }
 
 message GroupGetOneRequest {

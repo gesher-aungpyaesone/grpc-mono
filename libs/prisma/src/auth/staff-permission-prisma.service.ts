@@ -163,6 +163,8 @@ export class StaffPermissionService {
       await this.validateAllowIds(permission.resource.name, allow_ids);
     }
 
+    this.assignAdditionalPermisions(permission, staffPermissionAssignRequest);
+
     const existingPermission = await this.prisma.staffPermission.findFirst({
       where: { permission_id, staff_id },
     });
@@ -185,6 +187,68 @@ export class StaffPermissionService {
       },
     });
     return createdStaffPermission;
+  }
+
+  private async assignAdditionalPermisions(
+    permission: any,
+    staffPermissionAssignRequest: StaffPermissionAssignRequest,
+  ) {
+    if (permission.type.name === 'create') {
+      await this.assignAdditionalPermission(
+        permission.resource_id,
+        'read',
+        staffPermissionAssignRequest,
+      );
+      await this.assignAdditionalPermission(
+        permission.resource_id,
+        'edit',
+        staffPermissionAssignRequest,
+      );
+    } else if (permission.resource.name === 'edit') {
+      await this.assignAdditionalPermission(
+        permission.resource_id,
+        'read',
+        staffPermissionAssignRequest,
+      );
+    }
+  }
+
+  private async assignAdditionalPermission(
+    resource_id: number,
+    type: string,
+    staffPermissionAssignRequest: StaffPermissionAssignRequest,
+  ) {
+    const { created_by_id, staff_id, is_allowed_all, allow_ids } =
+      staffPermissionAssignRequest;
+    const permission = await this.prisma.permission.findFirst({
+      where: {
+        resource_id,
+        type: {
+          name: type,
+        },
+      },
+    });
+    if (!permission) return false;
+
+    const existingPermission = await this.prisma.staffPermission.findFirst({
+      where: {
+        staff_id,
+        permission_id: permission.id,
+      },
+    });
+
+    if (existingPermission) return false;
+
+    await this.prisma.staffPermission.create({
+      data: {
+        created_by_id,
+        staff_id,
+        permission_id: permission.id,
+        is_allowed_all,
+        allow_ids,
+      },
+    });
+    return true;
   }
 
   async deleteStaffPermission(

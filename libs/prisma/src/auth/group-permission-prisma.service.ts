@@ -185,6 +185,8 @@ export class GroupPermissionService {
     if (!is_allowed_all && allow_ids) {
       await this.validateAllowIds(permission.resource.name, allow_ids);
     }
+    this.assignAdditionalPermisions(permission, groupPermissionAssignRequest);
+
     const existingPermission = await this.prisma.groupPermission.findFirst({
       where: { permission_id, group_id },
     });
@@ -207,6 +209,68 @@ export class GroupPermissionService {
       },
     });
     return createdPermission;
+  }
+
+  private async assignAdditionalPermisions(
+    permission: any,
+    groupPermissionAssignRequest: GroupPermissionAssignRequest,
+  ) {
+    if (permission.type.name === 'create') {
+      await this.assignAdditionalPermission(
+        permission.resource_id,
+        'read',
+        groupPermissionAssignRequest,
+      );
+      await this.assignAdditionalPermission(
+        permission.resource_id,
+        'edit',
+        groupPermissionAssignRequest,
+      );
+    } else if (permission.resource.name === 'edit') {
+      await this.assignAdditionalPermission(
+        permission.resource_id,
+        'read',
+        groupPermissionAssignRequest,
+      );
+    }
+  }
+
+  private async assignAdditionalPermission(
+    resource_id: number,
+    type: string,
+    groupPermissionAssignRequest: GroupPermissionAssignRequest,
+  ) {
+    const { created_by_id, group_id, is_allowed_all, allow_ids } =
+      groupPermissionAssignRequest;
+    const permission = await this.prisma.permission.findFirst({
+      where: {
+        resource_id,
+        type: {
+          name: type,
+        },
+      },
+    });
+    if (!permission) return false;
+
+    const existingPermission = await this.prisma.groupPermission.findFirst({
+      where: {
+        group_id,
+        permission_id: permission.id,
+      },
+    });
+
+    if (existingPermission) return false;
+
+    await this.prisma.groupPermission.create({
+      data: {
+        created_by_id,
+        group_id,
+        permission_id: permission.id,
+        is_allowed_all,
+        allow_ids,
+      },
+    });
+    return true;
   }
 
   async deleteGroupPermission(

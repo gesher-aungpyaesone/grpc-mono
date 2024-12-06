@@ -76,9 +76,10 @@ export class StaffDepartmentController implements OnModuleInit {
   @Get()
   getList(
     @Query() staffDepartmentListDto: StaffDepartmentListDto,
+    @LoggedinStaff() staff: Staff,
   ): Observable<StaffDepartmentListResponse> {
     return this.staffDepartmentService
-      .getList({ ...staffDepartmentListDto })
+      .getList({ ...staffDepartmentListDto, current_user_id: staff.user_id })
       .pipe(
         catchError((error) => {
           throw handleError(error);

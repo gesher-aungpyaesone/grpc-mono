@@ -146,34 +146,52 @@ export class StaffService {
     return await this.validateStaffExistence(id);
   }
 
-  getFilterConditions(parsedFilter: Record<string, any>): Record<string, any> {
+  async getFilterConditions(
+    parsedFilter: Record<string, any>,
+    current_user_id: number,
+  ) {
     const filterConditions: Record<string, any> = {};
 
-    for (let key in parsedFilter) {
-      const filterValue = parsedFilter[key];
-
-      if (key === 'q') {
-        key = 'email';
-      }
-
-      if (key === 'exclude' && parsedFilter[key]) {
-        filterConditions['is_root'] = false;
-      } else if (key === 'id' && Array.isArray(filterValue)) {
-        filterConditions[key] = { in: filterValue };
-      } else if (typeof filterValue === 'string') {
-        filterConditions[key] = {
-          contains: filterValue,
-        };
+    if (parsedFilter['q']) {
+      filterConditions['email'] = { contains: parsedFilter['q'] };
+    }
+    if (
+      parsedFilter['is_allowed_all'] !== undefined &&
+      !parsedFilter['is_allowed_all']
+    ) {
+      const ownedStaffs = await this.prisma.staff.findMany({
+        where: {
+          created_by_id: current_user_id,
+        },
+        select: {
+          id: true,
+        },
+      });
+      const ownedIds = ownedStaffs.map(({ id }) => id);
+      if (parsedFilter['id']) {
+        const allowIds = parsedFilter['id'];
+        filterConditions['id'] = { in: ownedIds.concat(allowIds) };
       } else {
-        filterConditions[key] = filterValue;
+        filterConditions['id'] = { in: ownedIds };
       }
     }
 
+    if (parsedFilter['department_id']) {
+      filterConditions['department_id'] = parsedFilter['department_id'];
+    }
+
+    if (parsedFilter['position_id']) {
+      filterConditions['position_id'] = parsedFilter['position_id'];
+    }
+
+    if (parsedFilter['exclude']) {
+      filterConditions['is_root'] = false;
+    }
     return filterConditions;
   }
 
   async getListStaff(staffListRequest: StaffListRequest) {
-    const { sort, range, filter } = staffListRequest;
+    const { sort, range, filter, current_user_id } = staffListRequest;
     const fields = Object.keys(Prisma.StaffScalarFieldEnum);
     const parsedSort = validateSort(sort, fields);
     const parsedRange = validateRange(range);
@@ -195,8 +213,10 @@ export class StaffService {
       queryOptions.take = parsedRange[1] - parsedRange[0];
     }
     if (parsedFilter && Object.keys(parsedFilter).length > 0) {
-      const filterConditions = this.getFilterConditions(parsedFilter);
-
+      const filterConditions = await this.getFilterConditions(
+        parsedFilter,
+        current_user_id,
+      );
       queryOptions.where = {
         ...queryOptions.where,
         ...filterConditions,

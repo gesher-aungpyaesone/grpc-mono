@@ -71,10 +71,47 @@ export class StaffPositionService {
     return await this.validateStaffPositionExistence(id);
   }
 
+  async getFilterConditions(
+    parsedFilter: Record<string, any>,
+    current_user_id: number,
+  ) {
+    const filterConditions: Record<string, any> = {};
+
+    if (parsedFilter['q']) {
+      filterConditions['name'] = { contains: parsedFilter['q'] };
+    }
+    if (
+      parsedFilter['is_allowed_all'] !== undefined &&
+      !parsedFilter['is_allowed_all']
+    ) {
+      const ownedStaffs = await this.prisma.staffPosition.findMany({
+        where: {
+          created_by_id: current_user_id,
+        },
+        select: {
+          id: true,
+        },
+      });
+      const ownedIds = ownedStaffs.map(({ id }) => id);
+      if (parsedFilter['id']) {
+        const allowIds = parsedFilter['id'];
+        filterConditions['id'] = { in: ownedIds.concat(allowIds) };
+      } else {
+        filterConditions['id'] = { in: ownedIds };
+      }
+    }
+
+    if (parsedFilter['exclude']) {
+      filterConditions['is_root'] = false;
+    }
+
+    return filterConditions;
+  }
+
   async getListStaffPosition(
     staffPositionListRequest: StaffPositionListRequest,
   ) {
-    const { sort, range, filter } = staffPositionListRequest;
+    const { sort, range, filter, current_user_id } = staffPositionListRequest;
     const fields = Object.keys(Prisma.StaffPositionScalarFieldEnum);
     const parsedSort = validateSort(sort, fields);
     const parsedRange = validateRange(range);
@@ -93,22 +130,10 @@ export class StaffPositionService {
     }
 
     if (parsedFilter && Object.keys(parsedFilter).length > 0) {
-      const filterConditions: Record<string, any> = {};
-      for (let key in parsedFilter) {
-        const filterValue = parsedFilter[key];
-        if (key === 'q') {
-          key = 'name';
-        }
-        if (key === 'id' && Array.isArray(filterValue)) {
-          filterConditions[key] = { in: filterValue };
-        } else if (typeof filterValue === 'string') {
-          filterConditions[key] = {
-            contains: filterValue,
-          };
-        } else {
-          filterConditions[key] = filterValue;
-        }
-      }
+      const filterConditions = await this.getFilterConditions(
+        parsedFilter,
+        current_user_id,
+      );
 
       queryOptions.where = {
         ...queryOptions.where,
