@@ -234,6 +234,10 @@ async function main() {
     data: { name: 'ads-platform' },
   });
 
+  const permissionAdsToneResource = await prisma.permissionResource.create({
+    data: { name: 'ads-tone' },
+  });
+
   // Create permissions
   const permissions = [
 
@@ -389,6 +393,28 @@ async function main() {
       name: '[Ads Platform] Delete Ads Platform',
       permissionType: 'delete',
       resource: permissionAdsPlatformResource,
+    },
+
+    // tone
+    {
+      name: '[Ads Tone] Create Ads Tone',
+      permissionType: 'create',
+      resource: permissionAdsToneResource,
+    },
+    {
+      name: '[Ads Tone] Read Ads Tone',
+      permissionType: 'read',
+      resource: permissionAdsToneResource,
+    },
+    {
+      name: '[Ads Tone] Edit Ads Tone',
+      permissionType: 'edit',
+      resource: permissionAdsToneResource,
+    },
+    {
+      name: '[Ads Tone] Delete Ads Tone',
+      permissionType: 'delete',
+      resource: permissionAdsToneResource,
     },
     // Ads Gen End ==================================
   ];
