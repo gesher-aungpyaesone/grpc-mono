@@ -11,7 +11,7 @@ import {
   StaffUpdateRequest,
 } from 'protos/dist/auth';
 import { transformTimestamps } from 'utils';
-import { StaffService } from '@app/prisma/auth';
+import { StaffService } from '@app/auth-prisma/auth';
 
 @Controller('staff')
 export class StaffController {

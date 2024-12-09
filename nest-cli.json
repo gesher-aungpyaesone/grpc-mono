@@ -44,13 +44,40 @@
         "tsConfigPath": "libs/auth-client/tsconfig.lib.json"
       }
     },
-    "prisma": {
-      "type": "library",
-      "root": "libs/prisma",
-      "entryFile": "index",
-      "sourceRoot": "libs/prisma/src",
+    "ads-gen": {
+      "type": "application",
+      "root": "apps/ads-gen",
+      "entryFile": "main",
+      "sourceRoot": "apps/ads-gen/src",
       "compilerOptions": {
-        "tsConfigPath": "libs/prisma/tsconfig.lib.json"
+        "tsConfigPath": "apps/ads-gen/tsconfig.app.json"
+      }
+    },
+    "ads-gen-client": {
+      "type": "library",
+      "root": "libs/ads-gen-client",
+      "entryFile": "index",
+      "sourceRoot": "libs/ads-gen-client/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/ads-gen-client/tsconfig.lib.json"
+      }
+    },
+    "ads-gen-prisma": {
+      "type": "library",
+      "root": "libs/ads-gen-prisma",
+      "entryFile": "index",
+      "sourceRoot": "libs/ads-gen-prisma/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/ads-gen-prisma/tsconfig.lib.json"
+      }
+    },
+    "auth-prisma": {
+      "type": "library",
+      "root": "libs/auth-prisma",
+      "entryFile": "index",
+      "sourceRoot": "libs/auth-prisma/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/auth-prisma/tsconfig.lib.json"
       }
     }
   }

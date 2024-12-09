@@ -87,7 +87,9 @@
     ],
     "moduleNameMapper": {
       "^@app/auth-client(|/.*)$": "<rootDir>/libs/auth-client/src/$1",
-      "^@app/prisma(|/.*)$": "<rootDir>/libs/prisma/src/$1"
+      "^@app/ads-gen-client(|/.*)$": "<rootDir>/libs/ads-gen-client/src/$1",
+      "^@app/ads-gen-prisma(|/.*)$": "<rootDir>/libs/ads-gen-prisma/src/$1",
+      "^@app/auth-prisma(|/.*)$": "<rootDir>/libs/auth-prisma/src/$1"
     }
   },
   "workspaces": [

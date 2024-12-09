@@ -1,15 +1,15 @@
 import { Global, Module } from '@nestjs/common';
+import { AuthPrismaService } from './auth-prisma.service';
+import { UserService } from './auth/user-prisma.service';
 import {
-  AuthPrismaService,
-  GroupPermissionService,
-  GroupService,
   PermissionService,
-  StaffDepartmentService,
-  StaffGroupService,
-  StaffPermissionService,
   StaffPositionService,
+  StaffDepartmentService,
   StaffService,
-  UserService,
+  StaffPermissionService,
+  GroupService,
+  GroupPermissionService,
+  StaffGroupService,
 } from './auth';
 
 @Global()
@@ -27,6 +27,7 @@ import {
     StaffGroupService,
   ],
   exports: [
+    AuthPrismaService,
     UserService,
     PermissionService,
     StaffPositionService,
@@ -38,4 +39,4 @@ import {
     StaffGroupService,
   ],
 })
-export class PrismaModule {}
+export class AuthPrismaModule {}

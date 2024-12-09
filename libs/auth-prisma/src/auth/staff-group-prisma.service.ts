@@ -5,7 +5,7 @@ import {
   StaffGroupDeleteRequest,
   StaffGroupListRequest,
 } from 'protos/dist/auth';
-import { AuthPrismaService } from './auth-prisma.service';
+import { AuthPrismaService } from '../auth-prisma.service';
 import { validateFilter, validateRange, validateSort } from 'utils';
 import { UserService } from './user-prisma.service';
 import { StaffService } from './staff-prisma.service';

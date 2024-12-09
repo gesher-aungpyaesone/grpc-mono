@@ -1,4 +1,4 @@
-import { UserService } from '@app/prisma/auth';
+import { UserService } from '@app/auth-prisma/auth';
 import { Controller } from '@nestjs/common';
 import { GrpcMethod } from '@nestjs/microservices';
 import {

@@ -8,19 +8,33 @@ import {
   AuthHealthCheckResponse,
   AuthHealthServiceClient,
 } from 'protos/dist/auth';
+import {
+  ADS_GEN_HEALTH_SERVICE_NAME,
+  ADS_GEN_PACKAGE_NAME,
+  AdsGenHealthCheckResponse,
+  AdsGenHealthServiceClient,
+} from 'protos/dist/ads-gen';
 
 @Controller()
 export class AppController implements OnModuleInit {
   private authHealthService: AuthHealthServiceClient;
+  private adsGenHealthService: AdsGenHealthServiceClient;
   constructor(
-    @Inject(AUTH_PACKAGE_NAME) private client: ClientGrpc,
+    @Inject(AUTH_PACKAGE_NAME) private authClient: ClientGrpc,
+    @Inject(ADS_GEN_PACKAGE_NAME) private adsGenClient: ClientGrpc,
     private readonly appService: AppService,
   ) {}
 
   onModuleInit() {
-    this.authHealthService = this.client.getService<AuthHealthServiceClient>(
-      AUTH_HEALTH_SERVICE_NAME,
-    );
+    this.authHealthService =
+      this.authClient.getService<AuthHealthServiceClient>(
+        AUTH_HEALTH_SERVICE_NAME,
+      );
+
+    this.adsGenHealthService =
+      this.adsGenClient.getService<AdsGenHealthServiceClient>(
+        ADS_GEN_HEALTH_SERVICE_NAME,
+      );
   }
 
   @Get()
@@ -31,5 +45,10 @@ export class AppController implements OnModuleInit {
   @Get('auth/health')
   checkAuthHealth(): Observable<AuthHealthCheckResponse> {
     return this.authHealthService.check({});
+  }
+
+  @Get('ads-gen/health')
+  checkAdsGenHealth(): Observable<AdsGenHealthCheckResponse> {
+    return this.adsGenHealthService.check({});
   }
 }

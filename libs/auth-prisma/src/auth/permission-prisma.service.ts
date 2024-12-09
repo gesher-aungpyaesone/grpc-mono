@@ -7,7 +7,7 @@ import {
   PermissionListRequest,
 } from 'protos/dist/auth';
 import { Inject } from '@nestjs/common';
-import { AuthPrismaService } from './auth-prisma.service';
+import { AuthPrismaService } from '../auth-prisma.service';
 
 export class PermissionService {
   constructor(

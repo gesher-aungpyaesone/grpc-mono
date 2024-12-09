@@ -10,8 +10,7 @@ import {
   GroupListRequest,
   GroupUpdateRequest,
 } from 'protos/dist/auth';
-import { AuthPrismaService } from './auth-prisma.service';
-import { PermissionService } from './permission-prisma.service';
+import { AuthPrismaService } from '../auth-prisma.service';
 import { StaffService } from './staff-prisma.service';
 export class GroupService {
   constructor(
@@ -19,8 +18,6 @@ export class GroupService {
     private prisma: AuthPrismaService,
     @Inject()
     private readonly staffService: StaffService,
-    @Inject()
-    private readonly permissionService: PermissionService,
   ) {}
 
   async validateGroupExistence(group_id: number): Promise<Group> {

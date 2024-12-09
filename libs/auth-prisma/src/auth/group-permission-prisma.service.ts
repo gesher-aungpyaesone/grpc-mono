@@ -1,22 +1,23 @@
 import { Inject } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
 import * as grpc from '@grpc/grpc-js';
-import { Prisma, StaffPermission } from '@prisma/auth-ms';
+import { GroupPermission, Prisma } from '@prisma/auth-ms';
 import {
-  StaffPermissionAssignRequest,
-  StaffPermissionDeleteRequest,
-  StaffPermissionListByStaffRequest,
-  StaffPermissionListRequest,
+  GroupPermissionAssignRequest,
+  GroupPermissionDeleteRequest,
+  GroupPermissionListByGroupRequest,
+  GroupPermissionListByStaffRequest,
+  GroupPermissionListRequest,
 } from 'protos/dist/auth';
 import { PermissionService } from './permission-prisma.service';
-import { StaffService } from './staff-prisma.service';
-import { AuthPrismaService } from './auth-prisma.service';
+import { GroupService } from './group-prisma.service';
+import { AuthPrismaService } from '../auth-prisma.service';
 import { validateFilter, validateRange, validateSort } from 'utils';
 import { StaffPositionService } from './staff-position-prisma.service';
 import { UserService } from './user-prisma.service';
-import { GroupService } from './group-prisma.service';
+import { StaffService } from './staff-prisma.service';
 
-export class StaffPermissionService {
+export class GroupPermissionService {
   constructor(
     @Inject()
     private prisma: AuthPrismaService,
@@ -32,29 +33,29 @@ export class StaffPermissionService {
     private readonly permissionService: PermissionService,
   ) {}
 
-  async validateStaffPermissionExistence(id: number): Promise<StaffPermission> {
-    const existingStaff = await this.prisma.staffPermission.findUnique({
+  async validateGroupPermissionExistence(id: number): Promise<GroupPermission> {
+    const existingGroup = await this.prisma.groupPermission.findUnique({
       where: { id },
     });
 
-    if (!existingStaff)
+    if (!existingGroup)
       throw new RpcException({
         code: grpc.status.NOT_FOUND,
-        message: 'staff permission not found',
+        message: 'group permission not found',
       });
 
-    return existingStaff;
+    return existingGroup;
   }
 
-  async getListStaffPermissionByStaff(
-    staffPermissionListByStaffRequest: StaffPermissionListByStaffRequest,
+  async getListGroupPermissionByGroup(
+    groupPermissionListByGroupRequest: GroupPermissionListByGroupRequest,
   ) {
-    const { staff_id } = staffPermissionListByStaffRequest;
-    const staff = await this.prisma.staff.findUnique({
-      where: { id: staff_id },
+    const { group_id } = groupPermissionListByGroupRequest;
+    const group = await this.prisma.group.findUnique({
+      where: { id: group_id },
       select: {
         deleted_at: true,
-        staff_permissions: {
+        group_permissions: {
           include: {
             permission: {
               include: { resource: true, type: true },
@@ -64,23 +65,46 @@ export class StaffPermissionService {
       },
     });
 
-    if (!staff || (staff && staff.deleted_at))
+    if (!group || (group && group.deleted_at))
       throw new RpcException({
         code: grpc.status.NOT_FOUND,
-        message: 'staff not found',
+        message: 'group not found',
       });
-    return staff.staff_permissions;
+    return group.group_permissions;
   }
 
-  async getListStaffPermission(
-    staffPermissionListRequest: StaffPermissionListRequest,
+  async getListGroupPermissionByStaff(
+    groupPermissionListByStaffRequest: GroupPermissionListByStaffRequest,
   ) {
-    const { sort, range, filter } = staffPermissionListRequest;
-    const fields = Object.keys(Prisma.StaffPermissionScalarFieldEnum);
+    const { staff_id } = groupPermissionListByStaffRequest;
+    const groupPermissions = await this.prisma.groupPermission.findMany({
+      where: {
+        group: {
+          staff_groups: {
+            some: {
+              staff_id: staff_id,
+            },
+          },
+        },
+      },
+      include: {
+        permission: {
+          include: { resource: true, type: true },
+        },
+      },
+    });
+    return groupPermissions;
+  }
+
+  async getListGroupPermission(
+    groupPermissionListRequest: GroupPermissionListRequest,
+  ) {
+    const { sort, range, filter } = groupPermissionListRequest;
+    const fields = Object.keys(Prisma.GroupPermissionScalarFieldEnum);
     const parsedSort = validateSort(sort, fields);
     const parsedRange = validateRange(range);
     const parsedFilter = validateFilter(filter, fields);
-    const queryOptions: Prisma.StaffPermissionFindManyArgs = {
+    const queryOptions: Prisma.GroupPermissionFindManyArgs = {
       include: {
         permission: {
           include: { type: true, resource: true },
@@ -117,13 +141,13 @@ export class StaffPermissionService {
       };
     }
 
-    const staffPermissions =
-      await this.prisma.staffPermission.findMany(queryOptions);
-    const totalCount = await this.prisma.staffPermission.count({
+    const groupPermissions =
+      await this.prisma.groupPermission.findMany(queryOptions);
+    const totalCount = await this.prisma.groupPermission.count({
       where: queryOptions.where,
     });
 
-    return { staffPermissions, totalCount };
+    return { groupPermissions, totalCount };
   }
 
   private async validateAllowIds(resource: string, allow_ids: number[]) {
@@ -144,71 +168,69 @@ export class StaffPermissionService {
     }
   }
 
-  async assignStaffPermission(
-    staffPermissionAssignRequest: StaffPermissionAssignRequest,
+  async assignGroupPermission(
+    groupPermissionAssignRequest: GroupPermissionAssignRequest,
   ) {
     const {
-      staff_id,
+      group_id,
       permission_id,
       is_allowed_all,
       allow_ids,
       created_by_id,
-    } = staffPermissionAssignRequest;
-
-    await this.staffService.validateStaffExistence(staff_id);
+    } = groupPermissionAssignRequest;
+    await this.groupService.validateGroupExistence(group_id);
     await this.userService.validateUserExistence(created_by_id);
     const permission =
       await this.permissionService.validatePermissionExistence(permission_id);
     if (!is_allowed_all && allow_ids) {
       await this.validateAllowIds(permission.resource.name, allow_ids);
     }
+    this.assignAdditionalPermisions(permission, groupPermissionAssignRequest);
 
-    this.assignAdditionalPermisions(permission, staffPermissionAssignRequest);
-
-    const existingPermission = await this.prisma.staffPermission.findFirst({
-      where: { permission_id, staff_id },
+    const existingPermission = await this.prisma.groupPermission.findFirst({
+      where: { permission_id, group_id },
     });
 
     if (existingPermission) {
-      const updatedStaffPermission = await this.prisma.staffPermission.update({
+      const updatedStaffPermission = await this.prisma.groupPermission.update({
         where: { id: existingPermission.id },
         data: { is_allowed_all, allow_ids, created_by_id },
       });
       return updatedStaffPermission;
     }
 
-    const createdStaffPermission = await this.prisma.staffPermission.create({
+    const createdPermission = await this.prisma.groupPermission.create({
       data: {
         created_by_id,
-        staff_id,
+        group_id,
         permission_id,
         is_allowed_all,
         allow_ids,
       },
     });
-    return createdStaffPermission;
+    return createdPermission;
   }
 
   private async assignAdditionalPermisions(
     permission: any,
-    staffPermissionAssignRequest: StaffPermissionAssignRequest,
+    groupPermissionAssignRequest: GroupPermissionAssignRequest,
   ) {
     if (permission.type.name === 'create') {
       await this.assignAdditionalPermission(
         permission.resource_id,
         'read',
-        staffPermissionAssignRequest,
+        groupPermissionAssignRequest,
       );
       await this.assignAdditionalPermission(
         permission.resource_id,
         'edit',
-        staffPermissionAssignRequest,
+        groupPermissionAssignRequest,
       );
     } else if (permission.resource.name === 'edit') {
       await this.assignAdditionalPermission(
         permission.resource_id,
         'read',
-        staffPermissionAssignRequest,
+        groupPermissionAssignRequest,
       );
     }
   }
@@ -216,10 +238,10 @@ export class StaffPermissionService {
   private async assignAdditionalPermission(
     resource_id: number,
     type: string,
-    staffPermissionAssignRequest: StaffPermissionAssignRequest,
+    groupPermissionAssignRequest: GroupPermissionAssignRequest,
   ) {
-    const { created_by_id, staff_id, is_allowed_all, allow_ids } =
-      staffPermissionAssignRequest;
+    const { created_by_id, group_id, is_allowed_all, allow_ids } =
+      groupPermissionAssignRequest;
     const permission = await this.prisma.permission.findFirst({
       where: {
         resource_id,
@@ -230,19 +252,19 @@ export class StaffPermissionService {
     });
     if (!permission) return false;
 
-    const existingPermission = await this.prisma.staffPermission.findFirst({
+    const existingPermission = await this.prisma.groupPermission.findFirst({
       where: {
-        staff_id,
+        group_id,
         permission_id: permission.id,
       },
     });
 
     if (existingPermission) return false;
 
-    await this.prisma.staffPermission.create({
+    await this.prisma.groupPermission.create({
       data: {
         created_by_id,
-        staff_id,
+        group_id,
         permission_id: permission.id,
         is_allowed_all,
         allow_ids,
@@ -251,14 +273,14 @@ export class StaffPermissionService {
     return true;
   }
 
-  async deleteStaffPermission(
-    staffPermissionDeleteRequest: StaffPermissionDeleteRequest,
+  async deleteGroupPermission(
+    staffPermissionDeleteRequest: GroupPermissionDeleteRequest,
   ) {
     const { id } = staffPermissionDeleteRequest;
-    await this.validateStaffPermissionExistence(id);
-    const deletedStaffPermission = await this.prisma.staffPermission.delete({
+    await this.validateGroupPermissionExistence(id);
+    const deletedGroupPermission = await this.prisma.groupPermission.delete({
       where: { id },
     });
-    return deletedStaffPermission;
+    return deletedGroupPermission;
   }
 }

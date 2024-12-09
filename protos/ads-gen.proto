@@ -1,0 +1,75 @@
+syntax = "proto3";
+
+package ads_gen;
+
+import "google/protobuf/timestamp.proto";
+
+service AdsGenHealthService {
+  rpc check (AdsGenHealthCheckRequest) returns (AdsGenHealthCheckResponse);
+}
+
+message AdsGenHealthCheckRequest {
+}
+
+message AdsGenHealthCheckResponse {
+  bool status = 1;
+}
+
+// language
+message Language {
+  int32 id = 1;
+  string name = 2;
+  optional string description = 3;
+  optional google.protobuf.Timestamp created_at = 4;
+  optional google.protobuf.Timestamp updated_at = 5;
+  optional google.protobuf.Timestamp deleted_at = 6;
+  optional int32 created_by_id = 7;
+  optional int32 updated_by_id = 8;
+  optional int32 deleted_by_id = 9;
+}
+
+message LanguageCreateRequest {
+  string name = 1;
+  optional string description = 2;
+  int32 created_by_id = 3;
+}
+
+message LanguageResponse {
+  Language data = 1;
+}
+
+message LanguageUpdateRequest {
+  string name = 1;
+  optional string description = 2;
+  int32 updated_by_id = 3;
+  int32 id = 4;
+}
+
+message LanguageDeleteRequest {
+  int32 id = 1;
+  optional int32 deleted_by_id = 2;
+}
+
+message LanguageListRequest {
+  optional string sort = 1; // ["field_name", "ASC/DESC"]
+  optional string range = 2;  // [start, end]
+  optional string filter = 3; // {"field": "value", "field2": "value2"}
+  optional int32  current_user_id = 4;
+}
+
+message LanguageGetOneRequest {
+  int32 id = 1;
+}
+
+message LanguageListResponse {
+  repeated Language data = 1;
+  int32 total_count = 2;
+}
+
+service LanguageService {
+  rpc create (LanguageCreateRequest) returns (LanguageResponse);
+  rpc update (LanguageUpdateRequest) returns (LanguageResponse);
+  rpc delete (LanguageDeleteRequest) returns (LanguageResponse);
+  rpc getOne (LanguageGetOneRequest) returns (LanguageResponse);
+  rpc getList (LanguageListRequest) returns (LanguageListResponse);
+}

@@ -1,4 +1,4 @@
-import { StaffService } from '@app/prisma/auth';
+import { StaffService } from '@app/auth-prisma/auth';
 import { Controller } from '@nestjs/common';
 import { GrpcMethod } from '@nestjs/microservices';
 import {

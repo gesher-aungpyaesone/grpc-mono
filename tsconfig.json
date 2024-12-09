@@ -24,11 +24,23 @@
       "@app/auth-client/*": [
         "libs/auth-client/src/*"
       ],
-      "@app/prisma": [
-        "libs/prisma/src"
+      "@app/ads-gen-client": [
+        "libs/ads-gen-client/src"
       ],
-      "@app/prisma/*": [
-        "libs/prisma/src/*"
+      "@app/ads-gen-client/*": [
+        "libs/ads-gen-client/src/*"
+      ],
+      "@app/ads-gen-prisma": [
+        "libs/ads-gen-prisma/src"
+      ],
+      "@app/ads-gen-prisma/*": [
+        "libs/ads-gen-prisma/src/*"
+      ],
+      "@app/auth-prisma": [
+        "libs/auth-prisma/src"
+      ],
+      "@app/auth-prisma/*": [
+        "libs/auth-prisma/src/*"
       ]
     }
   }

@@ -1,0 +1,23 @@
+datasource db {
+    provider = "mysql"
+    url      = env("ADS_GEN_MS_DATABASE_URL")
+}
+
+generator client {
+    provider = "prisma-client-js"
+    output   = "../../node_modules/@prisma/ads-gen-ms"
+}
+
+model Language {
+    id            Int       @id @default(autoincrement())
+    name          String    @db.VarChar(255)
+    description   String?   @db.Text
+    created_at    DateTime  @default(now())
+    updated_at    DateTime  @updatedAt
+    deleted_at    DateTime?
+    created_by_id Int
+    updated_by_id Int
+    deleted_by_id Int?
+
+    @@map("languages")
+}

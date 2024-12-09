@@ -16,7 +16,7 @@ import {
   StaffUpdateRequest,
 } from 'protos/dist/auth';
 import { StaffPositionService } from './staff-position-prisma.service';
-import { AuthPrismaService } from './auth-prisma.service';
+import { AuthPrismaService } from '../auth-prisma.service';
 import { StaffDepartmentService } from './staff-department-prisma.service';
 
 export class StaffService {

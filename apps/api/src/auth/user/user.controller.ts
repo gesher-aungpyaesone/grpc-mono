@@ -5,6 +5,7 @@ import {
   OnModuleInit,
   Param,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { ClientGrpc } from '@nestjs/microservices';
 import {
@@ -17,6 +18,8 @@ import {
 import { catchError, Observable } from 'rxjs';
 import { handleError } from 'utils';
 import { UserListDto } from './dto';
+import { ApiBearerAuth } from '@nestjs/swagger';
+import { StaffAuthGuard } from '../../guard';
 
 @Controller('user')
 export class UserController implements OnModuleInit {
@@ -28,6 +31,8 @@ export class UserController implements OnModuleInit {
       this.client.getService<UserServiceClient>(USER_SERVICE_NAME);
   }
 
+  @ApiBearerAuth()
+  @UseGuards(StaffAuthGuard)
   @Get(':id')
   getOne(@Param('id') id: number): Observable<UserResponse> {
     return this.userService.getOne({ id: +id }).pipe(
@@ -37,6 +42,8 @@ export class UserController implements OnModuleInit {
     );
   }
 
+  @ApiBearerAuth()
+  @UseGuards(StaffAuthGuard)
   @Get()
   getList(@Query() staffListDto: UserListDto): Observable<UserListResponse> {
     return this.userService.getList({ ...staffListDto }).pipe(

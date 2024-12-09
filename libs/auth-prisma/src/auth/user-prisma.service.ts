@@ -4,7 +4,7 @@ import { User, Prisma } from '@prisma/auth-ms';
 import * as grpc from '@grpc/grpc-js';
 import { validateFilter, validateRange, validateSort } from 'utils';
 import { UserGetOneRequest, UserListRequest } from 'protos/dist/auth';
-import { AuthPrismaService } from './auth-prisma.service';
+import { AuthPrismaService } from '../auth-prisma.service';
 
 export class UserService {
   constructor(

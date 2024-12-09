@@ -4,55 +4,55 @@ import { Prisma } from '@prisma/auth-ms';
 import * as grpc from '@grpc/grpc-js';
 import { validateFilter, validateRange, validateSort } from 'utils';
 import {
-  StaffDepartmentCreateRequest,
-  StaffDepartmentDeleteRequest,
-  StaffDepartmentGetOneRequest,
-  StaffDepartmentListRequest,
-  StaffDepartmentUpdateRequest,
+  StaffPositionCreateRequest,
+  StaffPositionDeleteRequest,
+  StaffPositionGetOneRequest,
+  StaffPositionListRequest,
+  StaffPositionUpdateRequest,
 } from 'protos/dist/auth';
-import { AuthPrismaService } from './auth-prisma.service';
-export class StaffDepartmentService {
+import { AuthPrismaService } from '../auth-prisma.service';
+export class StaffPositionService {
   constructor(
     @Inject()
     private prisma: AuthPrismaService,
   ) {}
 
-  async validateStaffDepartmentExistence(department_id: number) {
-    const department = await this.prisma.staffDepartment.findUnique({
-      where: { id: department_id },
+  async validateStaffPositionExistence(position_id: number) {
+    const position = await this.prisma.staffPosition.findUnique({
+      where: { id: position_id },
     });
 
-    if (!department) {
+    if (!position) {
       throw new RpcException({
         code: grpc.status.NOT_FOUND,
-        message: 'department not found',
+        message: 'position not found',
       });
     }
 
-    return department;
+    return position;
   }
 
-  async validateStaffDepartmentsExistence(department_ids: number[]) {
-    const staffDepartments = await this.prisma.staffDepartment.findMany({
+  async validateStaffPositionsExistence(position_ids: number[]) {
+    const staffPositions = await this.prisma.staffPosition.findMany({
       where: {
-        id: { in: department_ids },
+        id: { in: position_ids },
       },
     });
-    if (staffDepartments.length !== department_ids.length) {
+    if (staffPositions.length !== position_ids.length) {
       throw new RpcException({
         code: grpc.status.NOT_FOUND,
-        message: 'One or more staff departments not found',
+        message: 'One or more staff positions not found',
       });
     }
 
-    return staffDepartments;
+    return staffPositions;
   }
 
-  async createStaffDepartment(
-    staffDepartmentCreateRequest: StaffDepartmentCreateRequest,
+  async createStaffPosition(
+    staffPositionCreateRequest: StaffPositionCreateRequest,
   ) {
-    const { name, description, created_by_id } = staffDepartmentCreateRequest;
-    const createdStaffDepartment = await this.prisma.staffDepartment.create({
+    const { name, description, created_by_id } = staffPositionCreateRequest;
+    const createdStaffPosition = await this.prisma.staffPosition.create({
       data: {
         name,
         description,
@@ -61,14 +61,14 @@ export class StaffDepartmentService {
       },
     });
 
-    return createdStaffDepartment;
+    return createdStaffPosition;
   }
 
-  async getOneStaffDepartment(
-    staffDepartmentGetOneRequest: StaffDepartmentGetOneRequest,
+  async getOneStaffPosition(
+    staffPositionGetOneRequest: StaffPositionGetOneRequest,
   ) {
-    const { id } = staffDepartmentGetOneRequest;
-    return await this.validateStaffDepartmentExistence(id);
+    const { id } = staffPositionGetOneRequest;
+    return await this.validateStaffPositionExistence(id);
   }
 
   async getFilterConditions(
@@ -84,7 +84,7 @@ export class StaffDepartmentService {
       parsedFilter['is_allowed_all'] !== undefined &&
       !parsedFilter['is_allowed_all']
     ) {
-      const ownedStaffs = await this.prisma.staffDepartment.findMany({
+      const ownedStaffs = await this.prisma.staffPosition.findMany({
         where: {
           created_by_id: current_user_id,
         },
@@ -108,15 +108,15 @@ export class StaffDepartmentService {
     return filterConditions;
   }
 
-  async getListStaffDepartment(
-    staffDepartmentListRequest: StaffDepartmentListRequest,
+  async getListStaffPosition(
+    staffPositionListRequest: StaffPositionListRequest,
   ) {
-    const { sort, range, filter, current_user_id } = staffDepartmentListRequest;
-    const fields = Object.keys(Prisma.StaffDepartmentScalarFieldEnum);
+    const { sort, range, filter, current_user_id } = staffPositionListRequest;
+    const fields = Object.keys(Prisma.StaffPositionScalarFieldEnum);
     const parsedSort = validateSort(sort, fields);
     const parsedRange = validateRange(range);
     const parsedFilter = validateFilter(filter, fields);
-    const queryOptions: Prisma.StaffDepartmentFindManyArgs = {
+    const queryOptions: Prisma.StaffPositionFindManyArgs = {
       where: { deleted_at: null },
     };
     if (parsedSort) {
@@ -141,23 +141,22 @@ export class StaffDepartmentService {
       };
     }
 
-    const staffDepartments =
-      await this.prisma.staffDepartment.findMany(queryOptions);
-    const totalCount = await this.prisma.staffDepartment.count({
+    const staffPositions =
+      await this.prisma.staffPosition.findMany(queryOptions);
+    const totalCount = await this.prisma.staffPosition.count({
       where: queryOptions.where,
     });
-    return { staffDepartments, totalCount };
+    return { staffPositions, totalCount };
   }
 
-  async updateStaffDepartment(
-    staffDepartmentUpdateRequest: StaffDepartmentUpdateRequest,
+  async updateStaffPosition(
+    staffPositionUpdateRequest: StaffPositionUpdateRequest,
   ) {
-    const { id, name, description, updated_by_id } =
-      staffDepartmentUpdateRequest;
+    const { id, name, description, updated_by_id } = staffPositionUpdateRequest;
 
-    await this.validateStaffDepartmentExistence(id);
+    await this.validateStaffPositionExistence(id);
 
-    const updatedStaffDepartment = await this.prisma.staffDepartment.update({
+    const updatedStaffPosition = await this.prisma.staffPosition.update({
       where: { id },
       data: {
         name,
@@ -166,21 +165,21 @@ export class StaffDepartmentService {
       },
     });
 
-    return updatedStaffDepartment;
+    return updatedStaffPosition;
   }
 
-  async deleteStaffDepartment(
-    staffDepartmentDeleteRequest: StaffDepartmentDeleteRequest,
+  async deleteStaffPosition(
+    staffPositionDeleteRequest: StaffPositionDeleteRequest,
   ) {
-    const { id, deleted_by_id } = staffDepartmentDeleteRequest;
-    await this.validateStaffDepartmentExistence(id);
-    const deletedStaffDepartment = await this.prisma.staffDepartment.update({
+    const { id, deleted_by_id } = staffPositionDeleteRequest;
+    await this.validateStaffPositionExistence(id);
+    const deletedStaffPosition = await this.prisma.staffPosition.update({
       where: { id },
       data: {
         deleted_at: new Date(),
         deleted_by_id,
       },
     });
-    return deletedStaffDepartment;
+    return deletedStaffPosition;
   }
 }

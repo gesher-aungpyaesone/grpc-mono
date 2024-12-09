@@ -3,18 +3,9 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthClientModule } from '@app/auth-client';
 import { ConfigModule } from '@nestjs/config';
-import {
-  GroupModule,
-  GroupPermissionModule,
-  PermissionModule,
-  StaffAuthModule,
-  StaffGroupModule,
-  StaffModule,
-  StaffPermissionModule,
-  StaffPositionModule,
-  StaffDepartmentModule,
-  UserModule,
-} from './auth';
+import { authModules } from './auth';
+import { AdsGenClientModule } from '@app/ads-gen-client';
+import { adsGenModules } from './ads-gen';
 
 @Module({
   imports: [
@@ -22,16 +13,9 @@ import {
       isGlobal: true,
     }),
     AuthClientModule,
-    PermissionModule,
-    UserModule,
-    StaffAuthModule,
-    StaffPositionModule,
-    StaffDepartmentModule,
-    StaffModule,
-    StaffPermissionModule,
-    GroupModule,
-    GroupPermissionModule,
-    StaffGroupModule,
+    ...authModules,
+    AdsGenClientModule,
+    ...adsGenModules,
   ],
   controllers: [AppController],
   providers: [AppService],
