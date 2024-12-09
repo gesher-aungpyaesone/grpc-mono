@@ -230,6 +230,10 @@ async function main() {
     data: { name: 'ads-language' },
   });
 
+  const permissionAdsPlatformResource = await prisma.permissionResource.create({
+    data: { name: 'ads-platform' },
+  });
+
   // Create permissions
   const permissions = [
 
@@ -343,7 +347,7 @@ async function main() {
     // Auth End ==================================
 
     // Ads Gen Start ==================================
-    // position
+    // language
     {
       name: '[Ads Language] Create Ads Generative Language',
       permissionType: 'create',
@@ -355,14 +359,36 @@ async function main() {
       resource: permissionAdsLanguageResource,
     },
     {
-      name: '[Ads Language] Edit Ads Generative Language',
+      name: '[Ads Language] Edit Ads Language',
       permissionType: 'edit',
       resource: permissionAdsLanguageResource,
     },
     {
-      name: '[Ads Language] Delete Ads Generative Language',
+      name: '[Ads Language] Delete Ads Language',
       permissionType: 'delete',
       resource: permissionAdsLanguageResource,
+    },
+
+    // platform
+    {
+      name: '[Ads Platform] Create Ads Platform',
+      permissionType: 'create',
+      resource: permissionAdsPlatformResource,
+    },
+    {
+      name: '[Ads Platform] Read Ads Platform',
+      permissionType: 'read',
+      resource: permissionAdsPlatformResource,
+    },
+    {
+      name: '[Ads Platform] Edit Ads Platform',
+      permissionType: 'edit',
+      resource: permissionAdsPlatformResource,
+    },
+    {
+      name: '[Ads Platform] Delete Ads Platform',
+      permissionType: 'delete',
+      resource: permissionAdsPlatformResource,
     },
     // Ads Gen End ==================================
   ];
