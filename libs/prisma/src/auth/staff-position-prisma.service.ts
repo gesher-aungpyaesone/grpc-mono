@@ -126,7 +126,7 @@ export class StaffPositionService {
 
     if (parsedRange) {
       queryOptions.skip = parsedRange[0];
-      queryOptions.take = parsedRange[1] - parsedRange[0];
+      queryOptions.take = parsedRange[1] + 1 - parsedRange[0];
     }
 
     if (parsedFilter && Object.keys(parsedFilter).length > 0) {
