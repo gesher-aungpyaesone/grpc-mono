@@ -4,6 +4,7 @@ import { AdsGenService } from './ads-gen.service';
 import { ConfigModule } from '@nestjs/config';
 import { AdsGenPrismaModule } from '@app/ads-gen-prisma';
 import { LanguageModule } from './language/language.module';
+import { PlatformModule } from './platform/platform.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { LanguageModule } from './language/language.module';
     }),
     AdsGenPrismaModule,
     LanguageModule,
+    PlatformModule,
   ],
   controllers: [AdsGenController],
   providers: [AdsGenService],

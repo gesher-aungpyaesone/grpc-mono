@@ -73,3 +73,62 @@ service LanguageService {
   rpc getOne (LanguageGetOneRequest) returns (LanguageResponse);
   rpc getList (LanguageListRequest) returns (LanguageListResponse);
 }
+
+// platform
+message Platform {
+  int32 id = 1;
+  string name = 2;
+  optional string description = 3;
+  optional google.protobuf.Timestamp created_at = 4;
+  optional google.protobuf.Timestamp updated_at = 5;
+  optional google.protobuf.Timestamp deleted_at = 6;
+  optional int32 created_by_id = 7;
+  optional int32 updated_by_id = 8;
+  optional int32 deleted_by_id = 9;
+}
+
+message PlatformCreateRequest {
+  string name = 1;
+  optional string description = 2;
+  int32 created_by_id = 3;
+}
+
+message PlatformResponse {
+  Platform data = 1;
+}
+
+message PlatformUpdateRequest {
+  string name = 1;
+  optional string description = 2;
+  int32 updated_by_id = 3;
+  int32 id = 4;
+}
+
+message PlatformDeleteRequest {
+  int32 id = 1;
+  optional int32 deleted_by_id = 2;
+}
+
+message PlatformListRequest {
+  optional string sort = 1; // ["field_name", "ASC/DESC"]
+  optional string range = 2;  // [start, end]
+  optional string filter = 3; // {"field": "value", "field2": "value2"}
+  optional int32  current_user_id = 4;
+}
+
+message PlatformGetOneRequest {
+  int32 id = 1;
+}
+
+message PlatformListResponse {
+  repeated Platform data = 1;
+  int32 total_count = 2;
+}
+
+service PlatformService {
+  rpc create (PlatformCreateRequest) returns (PlatformResponse);
+  rpc update (PlatformUpdateRequest) returns (PlatformResponse);
+  rpc delete (PlatformDeleteRequest) returns (PlatformResponse);
+  rpc getOne (PlatformGetOneRequest) returns (PlatformResponse);
+  rpc getList (PlatformListRequest) returns (PlatformListResponse);
+}
