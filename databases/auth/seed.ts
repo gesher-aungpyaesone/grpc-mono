@@ -226,8 +226,14 @@ async function main() {
     data: { name: 'staff-group' },
   });
 
+  const permissionAdsLanguageResource = await prisma.permissionResource.create({
+    data: { name: 'ads-language' },
+  });
+
   // Create permissions
   const permissions = [
+
+    // Auth Start ==================================
     // staff
     {
       name: '[Staff] Create Staff',
@@ -294,7 +300,7 @@ async function main() {
       resource: permissionDepartmentResource,
     },
 
-    // positiion
+    // position
     {
       name: '[Position] Create Staff Position',
       permissionType: 'create',
@@ -334,6 +340,31 @@ async function main() {
       permissionType: 'assign',
       resource: permissionStaffGroupResource,
     },
+    // Auth End ==================================
+
+    // Ads Gen Start ==================================
+    // position
+    {
+      name: '[Ads Language] Create Ads Generative Language',
+      permissionType: 'create',
+      resource: permissionAdsLanguageResource,
+    },
+    {
+      name: '[Ads Language] Read Ads Generative Language',
+      permissionType: 'read',
+      resource: permissionAdsLanguageResource,
+    },
+    {
+      name: '[Ads Language] Edit Ads Generative Language',
+      permissionType: 'edit',
+      resource: permissionAdsLanguageResource,
+    },
+    {
+      name: '[Ads Language] Delete Ads Generative Language',
+      permissionType: 'delete',
+      resource: permissionAdsLanguageResource,
+    },
+    // Ads Gen End ==================================
   ];
 
   for (const perm of permissions) {

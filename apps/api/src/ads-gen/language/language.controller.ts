@@ -27,7 +27,7 @@ import { catchError, Observable } from 'rxjs';
 import { handleError } from 'utils';
 import { Staff } from 'protos/dist/auth';
 
-@Controller('language')
+@Controller('ads-language')
 export class LanguageController implements OnModuleInit {
   private languageService: LanguageServiceClient;
   constructor(@Inject(ADS_GEN_PACKAGE_NAME) private client: ClientGrpc) {}
@@ -40,7 +40,7 @@ export class LanguageController implements OnModuleInit {
 
   @ApiBearerAuth()
   @UseGuards(StaffAuthGuard)
-  @StaffPermissionDecorator({ resource: 'language', action: 'create' })
+  @StaffPermissionDecorator({ resource: 'ads-language', action: 'create' })
   @Post()
   create(
     @Body() staffCreateDto: LanguageCreateDto,
@@ -84,7 +84,7 @@ export class LanguageController implements OnModuleInit {
 
   @ApiBearerAuth()
   @UseGuards(StaffAuthGuard)
-  @StaffPermissionDecorator({ resource: 'language', action: 'edit' })
+  @StaffPermissionDecorator({ resource: 'ads-language', action: 'edit' })
   @Put(':id')
   update(
     @Param('id') id: number,
@@ -102,7 +102,7 @@ export class LanguageController implements OnModuleInit {
 
   @ApiBearerAuth()
   @UseGuards(StaffAuthGuard)
-  @StaffPermissionDecorator({ resource: 'language', action: 'delete' })
+  @StaffPermissionDecorator({ resource: 'ads-language', action: 'delete' })
   @Delete(':id')
   delete(
     @Param('id') id: number,
