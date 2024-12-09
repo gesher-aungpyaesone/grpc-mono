@@ -104,9 +104,6 @@ export class LanguageService {
       filterConditions['is_root'] = false;
     }
 
-    console.log('======================');
-    console.log(filterConditions);
-
     return filterConditions;
   }
 

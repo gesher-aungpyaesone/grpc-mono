@@ -102,9 +102,6 @@ export class ToneService {
       filterConditions['is_root'] = false;
     }
 
-    console.log('======================');
-    console.log(filterConditions);
-
     return filterConditions;
   }
 

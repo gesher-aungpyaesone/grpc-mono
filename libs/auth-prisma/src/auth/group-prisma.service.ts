@@ -120,9 +120,6 @@ export class GroupService {
       filterConditions['is_root'] = false;
     }
 
-    console.log('======================');
-    console.log(filterConditions);
-
     return filterConditions;
   }
 
