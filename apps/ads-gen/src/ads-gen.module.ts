@@ -9,6 +9,7 @@ import { ToneModule } from './tone/tone.module';
 import { IndustryModule } from './industry/industry.module';
 import { CompanySizeModule } from './company-size/company-size.module';
 import { CompanyTypeModule } from './company-type/company-type.module';
+import { TargetModule } from './target/target.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { CompanyTypeModule } from './company-type/company-type.module';
     IndustryModule,
     CompanySizeModule,
     CompanyTypeModule,
+    TargetModule,
   ],
   controllers: [AdsGenController],
   providers: [AdsGenService],

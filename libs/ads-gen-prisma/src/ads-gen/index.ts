@@ -4,3 +4,4 @@ export * from './tone-prisma.service';
 export * from './industry-prisma.service';
 export * from './company-size-prisma.service';
 export * from './company-type-prisma.service';
+export * from './target-prisma.service';

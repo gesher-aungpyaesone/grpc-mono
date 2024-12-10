@@ -238,6 +238,10 @@ async function main() {
     data: { name: 'ads-tone' },
   });
 
+  const permissionAdsTargetResource = await prisma.permissionResource.create({
+    data: { name: 'ads-target' },
+  });
+
   const permissionAdsIndustryResource = await prisma.permissionResource.create({
     data: { name: 'ads-industry' },
   });
@@ -494,6 +498,28 @@ async function main() {
       name: '[Ads Company Type] Delete Ads Client Company Type',
       permissionType: 'delete',
       resource: permissionAdsCompanyTypeResource,
+    },
+
+    // target
+    {
+      name: '[Ads Target] Create Ads Target',
+      permissionType: 'create',
+      resource: permissionAdsTargetResource,
+    },
+    {
+      name: '[Ads Target] Read Ads Target',
+      permissionType: 'read',
+      resource: permissionAdsTargetResource,
+    },
+    {
+      name: '[Ads Target] Edit Ads Target',
+      permissionType: 'edit',
+      resource: permissionAdsTargetResource,
+    },
+    {
+      name: '[Ads Target] Delete Ads Target',
+      permissionType: 'delete',
+      resource: permissionAdsTargetResource,
     },
     // Ads Gen End ==================================
   ];

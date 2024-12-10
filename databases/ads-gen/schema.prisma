@@ -50,6 +50,20 @@ model Tone {
     @@map("tones")
 }
 
+model Target {
+    id            Int       @id @default(autoincrement())
+    name          String    @db.VarChar(255)
+    description   String?   @db.Text
+    created_at    DateTime  @default(now())
+    updated_at    DateTime  @updatedAt
+    deleted_at    DateTime?
+    created_by_id Int
+    updated_by_id Int
+    deleted_by_id Int?
+
+    @@map("targets")
+}
+
 model Industry {
     id            Int       @id @default(autoincrement())
     name          String    @db.VarChar(255)

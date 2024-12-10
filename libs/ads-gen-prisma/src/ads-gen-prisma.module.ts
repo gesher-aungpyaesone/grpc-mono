@@ -6,6 +6,7 @@ import {
   IndustryService,
   LanguageService,
   PlatformService,
+  TargetService,
   ToneService,
 } from './ads-gen';
 
@@ -19,6 +20,7 @@ import {
     IndustryService,
     CompanySizeService,
     CompanyTypeService,
+    TargetService,
   ],
   exports: [
     AdsGenPrismaService,
@@ -28,6 +30,7 @@ import {
     IndustryService,
     CompanySizeService,
     CompanyTypeService,
+    TargetService,
   ],
 })
 export class AdsGenPrismaModule {}
