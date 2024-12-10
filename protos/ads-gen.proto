@@ -250,3 +250,62 @@ service IndustryService {
   rpc getOne (IndustryGetOneRequest) returns (IndustryResponse);
   rpc getList (IndustryListRequest) returns (IndustryListResponse);
 }
+
+// CompanySize
+message CompanySize {
+  int32 id = 1;
+  string name = 2;
+  optional string description = 3;
+  optional google.protobuf.Timestamp created_at = 4;
+  optional google.protobuf.Timestamp updated_at = 5;
+  optional google.protobuf.Timestamp deleted_at = 6;
+  optional int32 created_by_id = 7;
+  optional int32 updated_by_id = 8;
+  optional int32 deleted_by_id = 9;
+}
+
+message CompanySizeCreateRequest {
+  string name = 1;
+  optional string description = 2;
+  int32 created_by_id = 3;
+}
+
+message CompanySizeResponse {
+  CompanySize data = 1;
+}
+
+message CompanySizeUpdateRequest {
+  string name = 1;
+  optional string description = 2;
+  int32 updated_by_id = 3;
+  int32 id = 4;
+}
+
+message CompanySizeDeleteRequest {
+  int32 id = 1;
+  optional int32 deleted_by_id = 2;
+}
+
+message CompanySizeListRequest {
+  optional string sort = 1; // ["field_name", "ASC/DESC"]
+  optional string range = 2;  // [start, end]
+  optional string filter = 3; // {"field": "value", "field2": "value2"}
+  optional int32  current_user_id = 4;
+}
+
+message CompanySizeGetOneRequest {
+  int32 id = 1;
+}
+
+message CompanySizeListResponse {
+  repeated CompanySize data = 1;
+  int32 total_count = 2;
+}
+
+service CompanySizeService {
+  rpc create (CompanySizeCreateRequest) returns (CompanySizeResponse);
+  rpc update (CompanySizeUpdateRequest) returns (CompanySizeResponse);
+  rpc delete (CompanySizeDeleteRequest) returns (CompanySizeResponse);
+  rpc getOne (CompanySizeGetOneRequest) returns (CompanySizeResponse);
+  rpc getList (CompanySizeListRequest) returns (CompanySizeListResponse);
+}

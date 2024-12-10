@@ -1,6 +1,7 @@
 import { Global, Module } from '@nestjs/common';
 import { AdsGenPrismaService } from './ads-gen-prisma.service';
 import {
+  CompanySizeService,
   IndustryService,
   LanguageService,
   PlatformService,
@@ -15,6 +16,7 @@ import {
     PlatformService,
     ToneService,
     IndustryService,
+    CompanySizeService,
   ],
   exports: [
     AdsGenPrismaService,
@@ -22,6 +24,7 @@ import {
     PlatformService,
     ToneService,
     IndustryService,
+    CompanySizeService,
   ],
 })
 export class AdsGenPrismaModule {}

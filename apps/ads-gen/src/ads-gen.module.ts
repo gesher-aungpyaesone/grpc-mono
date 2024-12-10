@@ -7,6 +7,7 @@ import { LanguageModule } from './language/language.module';
 import { PlatformModule } from './platform/platform.module';
 import { ToneModule } from './tone/tone.module';
 import { IndustryModule } from './industry/industry.module';
+import { CompanySizeModule } from './company-size/company-size.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { IndustryModule } from './industry/industry.module';
     PlatformModule,
     ToneModule,
     IndustryModule,
+    CompanySizeModule,
   ],
   controllers: [AdsGenController],
   providers: [AdsGenService],
