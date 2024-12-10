@@ -309,3 +309,62 @@ service CompanySizeService {
   rpc getOne (CompanySizeGetOneRequest) returns (CompanySizeResponse);
   rpc getList (CompanySizeListRequest) returns (CompanySizeListResponse);
 }
+
+// CompanyType
+message CompanyType {
+  int32 id = 1;
+  string name = 2;
+  optional string description = 3;
+  optional google.protobuf.Timestamp created_at = 4;
+  optional google.protobuf.Timestamp updated_at = 5;
+  optional google.protobuf.Timestamp deleted_at = 6;
+  optional int32 created_by_id = 7;
+  optional int32 updated_by_id = 8;
+  optional int32 deleted_by_id = 9;
+}
+
+message CompanyTypeCreateRequest {
+  string name = 1;
+  optional string description = 2;
+  int32 created_by_id = 3;
+}
+
+message CompanyTypeResponse {
+  CompanyType data = 1;
+}
+
+message CompanyTypeUpdateRequest {
+  string name = 1;
+  optional string description = 2;
+  int32 updated_by_id = 3;
+  int32 id = 4;
+}
+
+message CompanyTypeDeleteRequest {
+  int32 id = 1;
+  optional int32 deleted_by_id = 2;
+}
+
+message CompanyTypeListRequest {
+  optional string sort = 1; // ["field_name", "ASC/DESC"]
+  optional string range = 2;  // [start, end]
+  optional string filter = 3; // {"field": "value", "field2": "value2"}
+  optional int32  current_user_id = 4;
+}
+
+message CompanyTypeGetOneRequest {
+  int32 id = 1;
+}
+
+message CompanyTypeListResponse {
+  repeated CompanyType data = 1;
+  int32 total_count = 2;
+}
+
+service CompanyTypeService {
+  rpc create (CompanyTypeCreateRequest) returns (CompanyTypeResponse);
+  rpc update (CompanyTypeUpdateRequest) returns (CompanyTypeResponse);
+  rpc delete (CompanyTypeDeleteRequest) returns (CompanyTypeResponse);
+  rpc getOne (CompanyTypeGetOneRequest) returns (CompanyTypeResponse);
+  rpc getList (CompanyTypeListRequest) returns (CompanyTypeListResponse);
+}

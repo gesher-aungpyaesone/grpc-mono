@@ -247,6 +247,11 @@ async function main() {
       data: { name: 'ads-company-size' },
     });
 
+  const permissionAdsCompanyTypeResource =
+    await prisma.permissionResource.create({
+      data: { name: 'ads-company-type' },
+    });
+
   // Create permissions
   const permissions = [
     // Auth Start ==================================
@@ -447,7 +452,7 @@ async function main() {
       resource: permissionAdsIndustryResource,
     },
 
-    // industy
+    // company size
     {
       name: '[Ads Company Size] Create Ads Client Company Size',
       permissionType: 'create',
@@ -467,6 +472,28 @@ async function main() {
       name: '[Ads Company Size] Delete Ads Client Company Size',
       permissionType: 'delete',
       resource: permissionAdsCompanySizeResource,
+    },
+
+    // company type
+    {
+      name: '[Ads Company Type] Create Ads Client Company Type',
+      permissionType: 'create',
+      resource: permissionAdsCompanyTypeResource,
+    },
+    {
+      name: '[Ads Company Type] Read Ads Client Company Type',
+      permissionType: 'read',
+      resource: permissionAdsCompanyTypeResource,
+    },
+    {
+      name: '[Ads Company Type] Edit Ads Client Company Type',
+      permissionType: 'edit',
+      resource: permissionAdsCompanyTypeResource,
+    },
+    {
+      name: '[Ads Company Type] Delete Ads Client Company Type',
+      permissionType: 'delete',
+      resource: permissionAdsCompanyTypeResource,
     },
     // Ads Gen End ==================================
   ];
