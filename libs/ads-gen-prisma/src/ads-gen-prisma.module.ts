@@ -1,6 +1,11 @@
 import { Global, Module } from '@nestjs/common';
 import { AdsGenPrismaService } from './ads-gen-prisma.service';
-import { LanguageService, PlatformService, ToneService } from './ads-gen';
+import {
+  IndustryService,
+  LanguageService,
+  PlatformService,
+  ToneService,
+} from './ads-gen';
 
 @Global()
 @Module({
@@ -9,7 +14,14 @@ import { LanguageService, PlatformService, ToneService } from './ads-gen';
     LanguageService,
     PlatformService,
     ToneService,
+    IndustryService,
   ],
-  exports: [AdsGenPrismaService, LanguageService, PlatformService, ToneService],
+  exports: [
+    AdsGenPrismaService,
+    LanguageService,
+    PlatformService,
+    ToneService,
+    IndustryService,
+  ],
 })
 export class AdsGenPrismaModule {}

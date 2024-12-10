@@ -87,11 +87,11 @@ export class GroupController implements OnModuleInit {
   @Put(':id')
   update(
     @Param('id') id: number,
-    @Body() updateStaffDto: GroupUpdateDto,
+    @Body() updateGroupDto: GroupUpdateDto,
     @LoggedinStaff() staff: Staff,
   ): Observable<GroupResponse> {
     return this.groupService
-      .update({ ...updateStaffDto, updated_by_id: staff.user_id, id: +id })
+      .update({ ...updateGroupDto, updated_by_id: staff.user_id, id: +id })
       .pipe(
         catchError((error) => {
           throw handleError(error);

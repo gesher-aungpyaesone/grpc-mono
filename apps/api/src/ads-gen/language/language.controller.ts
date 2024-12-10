@@ -88,11 +88,11 @@ export class LanguageController implements OnModuleInit {
   @Put(':id')
   update(
     @Param('id') id: number,
-    @Body() updateStaffDto: LanguageUpdateDto,
+    @Body() updateLanguageDto: LanguageUpdateDto,
     @LoggedinStaff() staff: Staff,
   ): Observable<LanguageResponse> {
     return this.languageService
-      .update({ ...updateStaffDto, updated_by_id: staff.user_id, id: +id })
+      .update({ ...updateLanguageDto, updated_by_id: staff.user_id, id: +id })
       .pipe(
         catchError((error) => {
           throw handleError(error);

@@ -6,6 +6,7 @@ import { AdsGenPrismaModule } from '@app/ads-gen-prisma';
 import { LanguageModule } from './language/language.module';
 import { PlatformModule } from './platform/platform.module';
 import { ToneModule } from './tone/tone.module';
+import { IndustryModule } from './industry/industry.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { ToneModule } from './tone/tone.module';
     LanguageModule,
     PlatformModule,
     ToneModule,
+    IndustryModule,
   ],
   controllers: [AdsGenController],
   providers: [AdsGenService],

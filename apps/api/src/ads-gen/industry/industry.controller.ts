@@ -15,38 +15,38 @@ import { ClientGrpc } from '@nestjs/microservices';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import {
   ADS_GEN_PACKAGE_NAME,
-  PLATFORM_SERVICE_NAME,
-  PlatformListResponse,
-  PlatformResponse,
-  PlatformServiceClient,
+  INDUSTRY_SERVICE_NAME,
+  IndustryListResponse,
+  IndustryResponse,
+  IndustryServiceClient,
 } from 'protos/dist/ads-gen';
 import { StaffAuthGuard } from '../../guard';
 import { LoggedinStaff, StaffPermissionDecorator } from '../../decorator';
-import { PlatformCreateDto, PlatformListDto, PlatformUpdateDto } from './dto';
+import { IndustryCreateDto, IndustryListDto, IndustryUpdateDto } from './dto';
 import { catchError, Observable } from 'rxjs';
 import { handleError } from 'utils';
 import { Staff } from 'protos/dist/auth';
 
-@Controller('ads-platform')
-export class PlatformController implements OnModuleInit {
-  private platformService: PlatformServiceClient;
+@Controller('ads-industry')
+export class IndustryController implements OnModuleInit {
+  private industryService: IndustryServiceClient;
   constructor(@Inject(ADS_GEN_PACKAGE_NAME) private client: ClientGrpc) {}
 
   onModuleInit() {
-    this.platformService = this.client.getService<PlatformServiceClient>(
-      PLATFORM_SERVICE_NAME,
+    this.industryService = this.client.getService<IndustryServiceClient>(
+      INDUSTRY_SERVICE_NAME,
     );
   }
 
   @ApiBearerAuth()
   @UseGuards(StaffAuthGuard)
-  @StaffPermissionDecorator({ resource: 'ads-platform', action: 'create' })
+  @StaffPermissionDecorator({ resource: 'ads-industry', action: 'create' })
   @Post()
   create(
-    @Body() staffCreateDto: PlatformCreateDto,
+    @Body() staffCreateDto: IndustryCreateDto,
     @LoggedinStaff() staff: Staff,
-  ): Observable<PlatformResponse> {
-    return this.platformService
+  ): Observable<IndustryResponse> {
+    return this.industryService
       .create({ ...staffCreateDto, created_by_id: staff.user_id })
       .pipe(
         catchError((error) => {
@@ -58,8 +58,8 @@ export class PlatformController implements OnModuleInit {
   @ApiBearerAuth()
   @UseGuards(StaffAuthGuard)
   @Get(':id')
-  getOne(@Param('id') id: number): Observable<PlatformResponse> {
-    return this.platformService.getOne({ id: +id }).pipe(
+  getOne(@Param('id') id: number): Observable<IndustryResponse> {
+    return this.industryService.getOne({ id: +id }).pipe(
       catchError((error) => {
         throw handleError(error);
       }),
@@ -70,11 +70,11 @@ export class PlatformController implements OnModuleInit {
   @UseGuards(StaffAuthGuard)
   @Get()
   getList(
-    @Query() platformListDto: PlatformListDto,
+    @Query() industryListDto: IndustryListDto,
     @LoggedinStaff() staff: Staff,
-  ): Observable<PlatformListResponse> {
-    return this.platformService
-      .getList({ ...platformListDto, current_user_id: staff.user_id })
+  ): Observable<IndustryListResponse> {
+    return this.industryService
+      .getList({ ...industryListDto, current_user_id: staff.user_id })
       .pipe(
         catchError((error) => {
           throw handleError(error);
@@ -84,15 +84,15 @@ export class PlatformController implements OnModuleInit {
 
   @ApiBearerAuth()
   @UseGuards(StaffAuthGuard)
-  @StaffPermissionDecorator({ resource: 'ads-platform', action: 'edit' })
+  @StaffPermissionDecorator({ resource: 'ads-industry', action: 'edit' })
   @Put(':id')
   update(
     @Param('id') id: number,
-    @Body() updatePlatformDto: PlatformUpdateDto,
+    @Body() updateIndustryDto: IndustryUpdateDto,
     @LoggedinStaff() staff: Staff,
-  ): Observable<PlatformResponse> {
-    return this.platformService
-      .update({ ...updatePlatformDto, updated_by_id: staff.user_id, id: +id })
+  ): Observable<IndustryResponse> {
+    return this.industryService
+      .update({ ...updateIndustryDto, updated_by_id: staff.user_id, id: +id })
       .pipe(
         catchError((error) => {
           throw handleError(error);
@@ -102,13 +102,13 @@ export class PlatformController implements OnModuleInit {
 
   @ApiBearerAuth()
   @UseGuards(StaffAuthGuard)
-  @StaffPermissionDecorator({ resource: 'ads-platform', action: 'delete' })
+  @StaffPermissionDecorator({ resource: 'ads-industry', action: 'delete' })
   @Delete(':id')
   delete(
     @Param('id') id: number,
     @LoggedinStaff() staff: Staff,
-  ): Observable<PlatformResponse> {
-    return this.platformService
+  ): Observable<IndustryResponse> {
+    return this.industryService
       .delete({ id: +id, deleted_by_id: staff.user_id })
       .pipe(
         catchError((error) => {

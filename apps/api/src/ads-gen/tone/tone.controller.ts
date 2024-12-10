@@ -87,11 +87,11 @@ export class ToneController implements OnModuleInit {
   @Put(':id')
   update(
     @Param('id') id: number,
-    @Body() updateStaffDto: ToneUpdateDto,
+    @Body() updateToneDto: ToneUpdateDto,
     @LoggedinStaff() staff: Staff,
   ): Observable<ToneResponse> {
     return this.toneService
-      .update({ ...updateStaffDto, updated_by_id: staff.user_id, id: +id })
+      .update({ ...updateToneDto, updated_by_id: staff.user_id, id: +id })
       .pipe(
         catchError((error) => {
           throw handleError(error);
