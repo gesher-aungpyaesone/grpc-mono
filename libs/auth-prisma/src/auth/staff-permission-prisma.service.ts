@@ -137,7 +137,7 @@ export class StaffPermissionService {
         );
         break;
       case 'group':
-        await this.groupService.validategroupsExistence(allow_ids);
+        await this.groupService.validateGroupsExistence(allow_ids);
         break;
       default:
         break;

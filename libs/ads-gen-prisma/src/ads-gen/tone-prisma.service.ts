@@ -32,7 +32,7 @@ export class ToneService {
     return tone;
   }
 
-  async validatetonesExistence(tone_ids: number[]): Promise<Tone[]> {
+  async validateTonesExistence(tone_ids: number[]): Promise<Tone[]> {
     const tones = await this.prisma.tone.findMany({
       where: {
         id: { in: tone_ids },
@@ -81,7 +81,7 @@ export class ToneService {
       parsedFilter['is_allowed_all'] !== undefined &&
       !parsedFilter['is_allowed_all']
     ) {
-      const ownedStaffs = await this.prisma.tone.findMany({
+      const ownedRecords = await this.prisma.tone.findMany({
         where: {
           created_by_id: current_user_id,
         },
@@ -89,7 +89,7 @@ export class ToneService {
           id: true,
         },
       });
-      const ownedIds = ownedStaffs.map(({ id }) => id);
+      const ownedIds = ownedRecords.map(({ id }) => id);
       if (parsedFilter['id']) {
         const allowIds = parsedFilter['id'];
         filterConditions['id'] = { in: ownedIds.concat(allowIds) };

@@ -10,6 +10,7 @@ import { IndustryModule } from './industry/industry.module';
 import { CompanySizeModule } from './company-size/company-size.module';
 import { CompanyTypeModule } from './company-type/company-type.module';
 import { TargetModule } from './target/target.module';
+import { ClientCompanyModule } from './client-company/client-company.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { TargetModule } from './target/target.module';
     CompanySizeModule,
     CompanyTypeModule,
     TargetModule,
+    ClientCompanyModule,
   ],
   controllers: [AdsGenController],
   providers: [AdsGenService],

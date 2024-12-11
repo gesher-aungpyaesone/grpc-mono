@@ -32,7 +32,7 @@ export class LanguageService {
     return language;
   }
 
-  async validatelanguagesExistence(
+  async validateLanguagesExistence(
     language_ids: number[],
   ): Promise<Language[]> {
     const languages = await this.prisma.language.findMany({
@@ -83,7 +83,7 @@ export class LanguageService {
       parsedFilter['is_allowed_all'] !== undefined &&
       !parsedFilter['is_allowed_all']
     ) {
-      const ownedStaffs = await this.prisma.language.findMany({
+      const ownedRecords = await this.prisma.language.findMany({
         where: {
           created_by_id: current_user_id,
         },
@@ -91,7 +91,7 @@ export class LanguageService {
           id: true,
         },
       });
-      const ownedIds = ownedStaffs.map(({ id }) => id);
+      const ownedIds = ownedRecords.map(({ id }) => id);
       if (parsedFilter['id']) {
         const allowIds = parsedFilter['id'];
         filterConditions['id'] = { in: ownedIds.concat(allowIds) };

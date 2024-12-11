@@ -159,7 +159,7 @@ export class StaffService {
       parsedFilter['is_allowed_all'] !== undefined &&
       !parsedFilter['is_allowed_all']
     ) {
-      const ownedStaffs = await this.prisma.staff.findMany({
+      const ownedRecords = await this.prisma.staff.findMany({
         where: {
           created_by_id: current_user_id,
         },
@@ -167,7 +167,7 @@ export class StaffService {
           id: true,
         },
       });
-      const ownedIds = ownedStaffs.map(({ id }) => id);
+      const ownedIds = ownedRecords.map(({ id }) => id);
       if (parsedFilter['id']) {
         const allowIds = parsedFilter['id'];
         filterConditions['id'] = { in: ownedIds.concat(allowIds) };

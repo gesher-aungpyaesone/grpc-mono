@@ -34,7 +34,7 @@ export class CompanyTypeService {
     return companyType;
   }
 
-  async validatecompanyTypesExistence(
+  async validateCompanyTypesExistence(
     company_type_ids: number[],
   ): Promise<CompanyType[]> {
     const companyTypes = await this.prisma.companyType.findMany({
@@ -85,7 +85,7 @@ export class CompanyTypeService {
       parsedFilter['is_allowed_all'] !== undefined &&
       !parsedFilter['is_allowed_all']
     ) {
-      const ownedStaffs = await this.prisma.companyType.findMany({
+      const ownedRecords = await this.prisma.companyType.findMany({
         where: {
           created_by_id: current_user_id,
         },
@@ -93,7 +93,7 @@ export class CompanyTypeService {
           id: true,
         },
       });
-      const ownedIds = ownedStaffs.map(({ id }) => id);
+      const ownedIds = ownedRecords.map(({ id }) => id);
       if (parsedFilter['id']) {
         const allowIds = parsedFilter['id'];
         filterConditions['id'] = { in: ownedIds.concat(allowIds) };

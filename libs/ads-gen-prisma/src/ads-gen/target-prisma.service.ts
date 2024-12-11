@@ -32,7 +32,7 @@ export class TargetService {
     return target;
   }
 
-  async validatetargetsExistence(target_ids: number[]): Promise<Target[]> {
+  async validateTargetsExistence(target_ids: number[]): Promise<Target[]> {
     const targets = await this.prisma.target.findMany({
       where: {
         id: { in: target_ids },
@@ -81,7 +81,7 @@ export class TargetService {
       parsedFilter['is_allowed_all'] !== undefined &&
       !parsedFilter['is_allowed_all']
     ) {
-      const ownedStaffs = await this.prisma.target.findMany({
+      const ownedRecords = await this.prisma.target.findMany({
         where: {
           created_by_id: current_user_id,
         },
@@ -89,7 +89,7 @@ export class TargetService {
           id: true,
         },
       });
-      const ownedIds = ownedStaffs.map(({ id }) => id);
+      const ownedIds = ownedRecords.map(({ id }) => id);
       if (parsedFilter['id']) {
         const allowIds = parsedFilter['id'];
         filterConditions['id'] = { in: ownedIds.concat(allowIds) };

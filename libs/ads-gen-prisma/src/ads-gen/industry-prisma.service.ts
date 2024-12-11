@@ -32,7 +32,7 @@ export class IndustryService {
     return industry;
   }
 
-  async validateindustrysExistence(
+  async validateIndustrysExistence(
     industry_ids: number[],
   ): Promise<Industry[]> {
     const industrys = await this.prisma.industry.findMany({
@@ -83,7 +83,7 @@ export class IndustryService {
       parsedFilter['is_allowed_all'] !== undefined &&
       !parsedFilter['is_allowed_all']
     ) {
-      const ownedStaffs = await this.prisma.industry.findMany({
+      const ownedRecords = await this.prisma.industry.findMany({
         where: {
           created_by_id: current_user_id,
         },
@@ -91,7 +91,7 @@ export class IndustryService {
           id: true,
         },
       });
-      const ownedIds = ownedStaffs.map(({ id }) => id);
+      const ownedIds = ownedRecords.map(({ id }) => id);
       if (parsedFilter['id']) {
         const allowIds = parsedFilter['id'];
         filterConditions['id'] = { in: ownedIds.concat(allowIds) };

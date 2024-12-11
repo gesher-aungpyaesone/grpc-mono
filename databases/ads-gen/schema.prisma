@@ -65,43 +65,68 @@ model Target {
 }
 
 model Industry {
-    id            Int       @id @default(autoincrement())
-    name          String    @db.VarChar(255)
-    description   String?   @db.Text
-    created_at    DateTime  @default(now())
-    updated_at    DateTime  @updatedAt
-    deleted_at    DateTime?
-    created_by_id Int
-    updated_by_id Int
-    deleted_by_id Int?
+    id              Int             @id @default(autoincrement())
+    name            String          @db.VarChar(255)
+    description     String?         @db.Text
+    created_at      DateTime        @default(now())
+    updated_at      DateTime        @updatedAt
+    deleted_at      DateTime?
+    created_by_id   Int
+    updated_by_id   Int
+    deleted_by_id   Int?
+    client_companys ClientCompany[]
 
     @@map("industries")
 }
 
 model CompanySize {
-    id            Int       @id @default(autoincrement())
-    name          String    @db.VarChar(255)
-    description   String?   @db.Text
-    created_at    DateTime  @default(now())
-    updated_at    DateTime  @updatedAt
-    deleted_at    DateTime?
-    created_by_id Int
-    updated_by_id Int
-    deleted_by_id Int?
+    id              Int             @id @default(autoincrement())
+    name            String          @db.VarChar(255)
+    description     String?         @db.Text
+    created_at      DateTime        @default(now())
+    updated_at      DateTime        @updatedAt
+    deleted_at      DateTime?
+    created_by_id   Int
+    updated_by_id   Int
+    deleted_by_id   Int?
+    client_companys ClientCompany[]
 
     @@map("company_sizes")
 }
 
 model CompanyType {
-    id            Int       @id @default(autoincrement())
-    name          String    @db.VarChar(255)
-    description   String?   @db.Text
-    created_at    DateTime  @default(now())
-    updated_at    DateTime  @updatedAt
+    id              Int             @id @default(autoincrement())
+    name            String          @db.VarChar(255)
+    description     String?         @db.Text
+    created_at      DateTime        @default(now())
+    updated_at      DateTime        @updatedAt
+    deleted_at      DateTime?
+    created_by_id   Int
+    updated_by_id   Int
+    deleted_by_id   Int?
+    client_companys ClientCompany[]
+
+    @@map("company_types")
+}
+
+model ClientCompany {
+    id            Int         @id @default(autoincrement())
+    name          String      @unique @db.VarChar(255)
+    website_url   String?     @db.VarChar(255)
+    strength      String?     @db.VarChar(255)
+    others        String?     @db.Text
+    industry      Industry    @relation(fields: [industry_id], references: [id])
+    industry_id   Int
+    type          CompanyType @relation(fields: [type_id], references: [id])
+    type_id       Int
+    size          CompanySize @relation(fields: [size_id], references: [id])
+    size_id       Int
+    created_at    DateTime    @default(now())
+    updated_at    DateTime    @updatedAt
     deleted_at    DateTime?
     created_by_id Int
     updated_by_id Int
     deleted_by_id Int?
 
-    @@map("company_types")
+    @@map("client_companies")
 }

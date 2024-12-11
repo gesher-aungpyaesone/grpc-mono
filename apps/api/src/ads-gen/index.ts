@@ -1,3 +1,4 @@
+import { ClientCompanyModule } from './client-company/client-company.module';
 import { CompanySizeModule } from './company-size/company-size.module';
 import { CompanyTypeModule } from './company-type/company-type.module';
 import { IndustryModule } from './industry/industry.module';
@@ -14,4 +15,5 @@ export const adsGenModules = [
   CompanySizeModule,
   CompanyTypeModule,
   TargetModule,
+  ClientCompanyModule,
 ];

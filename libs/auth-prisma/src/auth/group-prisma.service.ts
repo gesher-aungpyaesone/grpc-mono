@@ -39,7 +39,7 @@ export class GroupService {
     return group;
   }
 
-  async validategroupsExistence(group_ids: number[]): Promise<Group[]> {
+  async validateGroupsExistence(group_ids: number[]): Promise<Group[]> {
     const groups = await this.prisma.group.findMany({
       where: {
         id: { in: group_ids },
@@ -99,7 +99,7 @@ export class GroupService {
       parsedFilter['is_allowed_all'] !== undefined &&
       !parsedFilter['is_allowed_all']
     ) {
-      const ownedStaffs = await this.prisma.group.findMany({
+      const ownedRecords = await this.prisma.group.findMany({
         where: {
           created_by_id: current_user_id,
         },
@@ -107,7 +107,7 @@ export class GroupService {
           id: true,
         },
       });
-      const ownedIds = ownedStaffs.map(({ id }) => id);
+      const ownedIds = ownedRecords.map(({ id }) => id);
       if (parsedFilter['id']) {
         const allowIds = parsedFilter['id'];
         filterConditions['id'] = { in: ownedIds.concat(allowIds) };

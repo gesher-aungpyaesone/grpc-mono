@@ -32,7 +32,7 @@ export class PlatformService {
     return platform;
   }
 
-  async validateplatformsExistence(
+  async validatePlatformsExistence(
     platform_ids: number[],
   ): Promise<Platform[]> {
     const platforms = await this.prisma.platform.findMany({
@@ -83,7 +83,7 @@ export class PlatformService {
       parsedFilter['is_allowed_all'] !== undefined &&
       !parsedFilter['is_allowed_all']
     ) {
-      const ownedStaffs = await this.prisma.platform.findMany({
+      const ownedRecords = await this.prisma.platform.findMany({
         where: {
           created_by_id: current_user_id,
         },
@@ -91,7 +91,7 @@ export class PlatformService {
           id: true,
         },
       });
-      const ownedIds = ownedStaffs.map(({ id }) => id);
+      const ownedIds = ownedRecords.map(({ id }) => id);
       if (parsedFilter['id']) {
         const allowIds = parsedFilter['id'];
         filterConditions['id'] = { in: ownedIds.concat(allowIds) };

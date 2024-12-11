@@ -256,6 +256,11 @@ async function main() {
       data: { name: 'ads-company-type' },
     });
 
+  const permissionAdsClientCompanyResource =
+    await prisma.permissionResource.create({
+      data: { name: 'ads-client-company' },
+    });
+
   // Create permissions
   const permissions = [
     // Auth Start ==================================
@@ -520,6 +525,28 @@ async function main() {
       name: '[Ads Target] Delete Ads Target',
       permissionType: 'delete',
       resource: permissionAdsTargetResource,
+    },
+
+    // client company
+    {
+      name: '[Ads Client Company] Create Ads Client Company',
+      permissionType: 'create',
+      resource: permissionAdsClientCompanyResource,
+    },
+    {
+      name: '[Ads Client Company] Read Ads Client Company',
+      permissionType: 'read',
+      resource: permissionAdsClientCompanyResource,
+    },
+    {
+      name: '[Ads Client Company] Edit Ads Client Company',
+      permissionType: 'edit',
+      resource: permissionAdsClientCompanyResource,
+    },
+    {
+      name: '[Ads Client Company] Delete Ads Client Company',
+      permissionType: 'delete',
+      resource: permissionAdsClientCompanyResource,
     },
     // Ads Gen End ==================================
   ];
