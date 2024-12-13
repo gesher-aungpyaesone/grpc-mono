@@ -6,3 +6,4 @@ export * from './company-size-prisma.service';
 export * from './company-type-prisma.service';
 export * from './target-prisma.service';
 export * from './client-company-prisma.service';
+export * from './content-type-prisma.service';

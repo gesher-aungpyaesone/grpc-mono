@@ -261,6 +261,15 @@ async function main() {
       data: { name: 'ads-client-company' },
     });
 
+  const permissionAdsContentTypeResource =
+    await prisma.permissionResource.create({
+      data: { name: 'ads-content-type' },
+    });
+
+  const permissionAdsContentResource = await prisma.permissionResource.create({
+    data: { name: 'ads-content' },
+  });
+
   // Create permissions
   const permissions = [
     // Auth Start ==================================
@@ -547,6 +556,50 @@ async function main() {
       name: '[Ads Client Company] Delete Ads Client Company',
       permissionType: 'delete',
       resource: permissionAdsClientCompanyResource,
+    },
+
+    // content type
+    {
+      name: '[Ads Content Type] Create Ads Content Type',
+      permissionType: 'create',
+      resource: permissionAdsContentTypeResource,
+    },
+    {
+      name: '[Ads Content Type] Read Ads Content Type',
+      permissionType: 'read',
+      resource: permissionAdsContentTypeResource,
+    },
+    {
+      name: '[Ads Content Type] Edit Ads Content Type',
+      permissionType: 'edit',
+      resource: permissionAdsContentTypeResource,
+    },
+    {
+      name: '[Ads Content Type] Delete Ads Content Type',
+      permissionType: 'delete',
+      resource: permissionAdsContentTypeResource,
+    },
+
+    // content
+    {
+      name: '[Ads Content] Create Ads Content',
+      permissionType: 'create',
+      resource: permissionAdsContentResource,
+    },
+    {
+      name: '[Ads Content] Read Ads Content',
+      permissionType: 'read',
+      resource: permissionAdsContentResource,
+    },
+    {
+      name: '[Ads Content] Edit Ads Content',
+      permissionType: 'edit',
+      resource: permissionAdsContentResource,
+    },
+    {
+      name: '[Ads Content] Delete Ads Content',
+      permissionType: 'delete',
+      resource: permissionAdsContentResource,
     },
     // Ads Gen End ==================================
   ];

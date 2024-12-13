@@ -11,6 +11,7 @@ import { CompanySizeModule } from './company-size/company-size.module';
 import { CompanyTypeModule } from './company-type/company-type.module';
 import { TargetModule } from './target/target.module';
 import { ClientCompanyModule } from './client-company/client-company.module';
+import { ContentTypeModule } from './content-type/content-type.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { ClientCompanyModule } from './client-company/client-company.module';
     CompanyTypeModule,
     TargetModule,
     ClientCompanyModule,
+    ContentTypeModule,
   ],
   controllers: [AdsGenController],
   providers: [AdsGenService],

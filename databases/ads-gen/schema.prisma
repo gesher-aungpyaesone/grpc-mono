@@ -18,6 +18,7 @@ model Language {
     created_by_id Int
     updated_by_id Int
     deleted_by_id Int?
+    contents      Content[]
 
     @@map("languages")
 }
@@ -32,6 +33,7 @@ model Platform {
     created_by_id Int
     updated_by_id Int
     deleted_by_id Int?
+    contents      Content[]
 
     @@map("platforms")
 }
@@ -46,20 +48,22 @@ model Tone {
     created_by_id Int
     updated_by_id Int
     deleted_by_id Int?
+    contents      Content[]
 
     @@map("tones")
 }
 
 model Target {
-    id            Int       @id @default(autoincrement())
-    name          String    @db.VarChar(255)
-    description   String?   @db.Text
-    created_at    DateTime  @default(now())
-    updated_at    DateTime  @updatedAt
+    id            Int             @id @default(autoincrement())
+    name          String          @db.VarChar(255)
+    description   String?         @db.Text
+    created_at    DateTime        @default(now())
+    updated_at    DateTime        @updatedAt
     deleted_at    DateTime?
     created_by_id Int
     updated_by_id Int
     deleted_by_id Int?
+    contents      ContentTarget[]
 
     @@map("targets")
 }
@@ -127,6 +131,72 @@ model ClientCompany {
     created_by_id Int
     updated_by_id Int
     deleted_by_id Int?
+    contents      Content[]
 
     @@map("client_companies")
+}
+
+model ContentType {
+    id            Int       @id @default(autoincrement())
+    name          String    @db.VarChar(255)
+    description   String?   @db.Text
+    created_at    DateTime  @default(now())
+    updated_at    DateTime  @updatedAt
+    deleted_at    DateTime?
+    created_by_id Int
+    updated_by_id Int
+    deleted_by_id Int?
+    contents      Content[]
+
+    @@map("content_types")
+}
+
+model Content {
+    id                Int             @id @default(autoincrement())
+    client_company    ClientCompany   @relation(fields: [client_company_id], references: [id])
+    client_company_id Int
+    tone              Tone            @relation(fields: [tone_id], references: [id])
+    tone_id           Int
+    platform          Platform        @relation(fields: [platform_id], references: [id])
+    platform_id       Int
+    language          Language        @relation(fields: [language_id], references: [id])
+    language_id       Int
+    type              ContentType     @relation(fields: [type_id], references: [id])
+    type_id           Int
+    created_at        DateTime        @default(now())
+    updated_at        DateTime        @updatedAt
+    deleted_at        DateTime?
+    created_by_id     Int
+    updated_by_id     Int
+    deleted_by_id     Int?
+    targets           ContentTarget[]
+
+    @@map("contents")
+}
+
+model ContentTarget {
+    id         Int      @id @default(autoincrement())
+    content    Content  @relation(fields: [content_id], references: [id])
+    content_id Int
+    target     Target   @relation(fields: [target_id], references: [id])
+    target_id  Int
+    created_at DateTime @default(now())
+
+    @@map("staff_groups")
+}
+
+model Keyword {
+    id         Int      @id @default(autoincrement())
+    text       String   @db.VarChar(255)
+    created_at DateTime @default(now())
+
+    @@map("keywords")
+}
+
+model ResourceLink {
+    id         Int      @id @default(autoincrement())
+    text       String   @db.VarChar(255)
+    created_at DateTime @default(now())
+
+    @@map("resource_links")
 }

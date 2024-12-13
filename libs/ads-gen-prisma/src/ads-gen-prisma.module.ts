@@ -4,6 +4,7 @@ import {
   ClientCompanyService,
   CompanySizeService,
   CompanyTypeService,
+  ContentTypeService,
   IndustryService,
   LanguageService,
   PlatformService,
@@ -23,6 +24,7 @@ import {
     CompanyTypeService,
     TargetService,
     ClientCompanyService,
+    ContentTypeService,
   ],
   exports: [
     AdsGenPrismaService,
@@ -34,6 +36,7 @@ import {
     CompanyTypeService,
     TargetService,
     ClientCompanyService,
+    ContentTypeService,
   ],
 })
 export class AdsGenPrismaModule {}
